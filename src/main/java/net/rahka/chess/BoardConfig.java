@@ -4,16 +4,17 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import net.rahka.chess.pieces.Bishop;
-import net.rahka.chess.pieces.King;
-import net.rahka.chess.pieces.Knight;
-import net.rahka.chess.pieces.Pawn;
-import net.rahka.chess.pieces.Piece;
-import net.rahka.chess.pieces.Queen;
-import net.rahka.chess.pieces.Rook;
+import net.rahka.chess.game.Player;
+import net.rahka.chess.game.pieces.Bishop;
+import net.rahka.chess.game.pieces.King;
+import net.rahka.chess.game.pieces.Knight;
+import net.rahka.chess.game.pieces.Pawn;
+import net.rahka.chess.game.pieces.Piece;
+import net.rahka.chess.game.pieces.Queen;
+import net.rahka.chess.game.pieces.Rook;
+import net.rahka.chess.game.pieces.Queen;
 
 import java.util.Iterator;
-import java.util.function.Supplier;
 
 @RequiredArgsConstructor
 public abstract class BoardConfig {

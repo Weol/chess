@@ -1,7 +1,82 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="a5d6d256-29af-436b-b6b9-e9b8bda87aa4" name="Default Changelist" comment="" />
+    <list default="true" id="e1e462b9-b36d-4329-a34f-4b7ba7b1811c" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/chess.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_mapstruct_mapstruct_processor_1_3_0_Final.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_openjfx_javafx_base_13.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_openjfx_javafx_base_linux_13.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_openjfx_javafx_controls_13.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_openjfx_javafx_controls_linux_13.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_openjfx_javafx_graphics_13.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_openjfx_javafx_graphics_linux_13.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_projectlombok_lombok_1_18_10.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/chess.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/CLI.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/agent/MiniMaxAgent.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/agent/SimpleHeuristicAgent.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/agent/heuristics/Heuristic.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/agent/heuristics/RemainingPiecesHeuristic.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/net/rahka/paramaters/CollectionFlag.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/net/rahka/paramaters/ConusmerFlag.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/net/rahka/paramaters/Flag.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/net/rahka/paramaters/FunctionFlag.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/net/rahka/paramaters/ParamaterException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/net/rahka/paramaters/ParameterInterpretation.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/net/rahka/paramaters/ParameterInterpreter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/net/rahka/paramaters/RunnableFlag.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/uiDesigner.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/net.rahka.chess.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/AgentHolder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/AgentHolder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/Application.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/Application.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/IO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/IO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/agent/AStarAgent.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/agent/Agent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/agent/Agent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/agent/RandomAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/agent/RandomAgent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/agent/RandomKillingAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/agent/RandomKillingAgent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/agent/RandomPriorityKillingAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/agent/RandomPriorityKillingAgent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/chess/Board.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/game/Board.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/chess/BoardConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/BoardConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/chess/Chess.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/game/Chess.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/chess/Player.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/game/Player.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/chess/pieces/Bishop.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/game/pieces/Bishop.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/chess/pieces/King.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/game/pieces/King.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/chess/pieces/Knight.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/game/pieces/Knight.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/chess/pieces/Move.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/game/pieces/Move.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/chess/pieces/Pawn.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/game/pieces/Pawn.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/chess/pieces/Piece.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/game/pieces/Piece.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/chess/pieces/Queen.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/game/pieces/Queen.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/chess/pieces/Rook.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/game/pieces/Rook.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/utils/SortedHashSet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/utils/SortedHashSet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/visualizer/ChessBoard.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/visualizer/ChessBoard.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/visualizer/CursorList.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/visualizer/DropdownPopupButton.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/visualizer/DropdownPopupButton.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/visualizer/HashQueueMap.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/visualizer/ImageButton.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/visualizer/ImageButton.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/visualizer/Visualizer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/visualizer/Visualizer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/pieces/b_bishop.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/b_bishop.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/pieces/b_king.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/b_king.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/pieces/b_knight.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/b_knight.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/pieces/b_pawn.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/b_pawn.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/pieces/b_queen.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/b_queen.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/pieces/b_rook.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/b_rook.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/pieces/w_bishop.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/w_bishop.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/pieces/w_king.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/w_king.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/pieces/w_knight.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/w_knight.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/pieces/w_pawn.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/w_pawn.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/pieces/w_queen.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/w_queen.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/pieces/w_rook.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/w_rook.png" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -22,87 +97,57 @@
     <expand />
     <select />
   </component>
-  <component name="FavoritesManager">
-    <favorites_list name="chess" />
-  </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
+        <option value="module-info" />
         <option value="Interface" />
-        <option value="Enum" />
-        <option value="package-info" />
         <option value="Class" />
       </list>
     </option>
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="ROOT_SYNC" value="DONT_SYNC" />
+  </component>
   <component name="MavenImportPreferences">
-    <option name="generalSettings">
-      <MavenGeneralSettings>
-        <option name="printErrorStackTraces" value="true" />
-      </MavenGeneralSettings>
-    </option>
     <option name="importingSettings">
       <MavenImportingSettings>
         <option name="importAutomatically" value="true" />
-        <option name="vmOptionsForImporter" value="-Xmx768m" />
+        <option name="jdkForImporter" value="11" />
+        <option name="vmOptionsForImporter" value="-Xmx2048m" />
       </MavenImportingSettings>
     </option>
   </component>
-  <component name="ProjectId" id="1R99AkHOgm1GfGju8rPLyNK1LWk" />
+  <component name="MavenRunner">
+    <option name="jreName" value="#JAVA_INTERNAL" />
+  </component>
+  <component name="ProjectId" id="1TeYpXqUl5M3prWyx2GUglnIwoo" />
   <component name="PropertiesComponent">
-    <property name="Downloaded.Files.Path.Enabled" value="false" />
-    <property name="Repository.Attach.Annotations" value="false" />
-    <property name="Repository.Attach.JavaDocs" value="false" />
-    <property name="Repository.Attach.Sources" value="false" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="ignore.virus.scanning.warn.message" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../TDT4117/Assignment 4/lucene" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/main/java/net/rahka/chess" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
-    <property name="nodejs_package_manager_path" value="npm" />
-    <property name="project.structure.last.edited" value="Libraries" />
+    <property name="project.structure.last.edited" value="Project" />
     <property name="project.structure.proportion" value="0.15" />
-    <property name="project.structure.side.proportion" value="0.34827587" />
+    <property name="project.structure.side.proportion" value="0.2" />
     <property name="restartRequiresConfirmation" value="false" />
-    <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
     <property name="settings.editor.selected.configurable" value="reference.settings.project.maven.runner" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\Erik\Workspace\Projects\chess\src\main\resources" />
-      <recent name="C:\Users\Erik\Workspace\Projects\chess\src\main\resources\pieces2" />
-      <recent name="C:\Users\Erik\Workspace\Projects\chess\src\main\java\net\rahka\chess" />
-      <recent name="C:\Users\Erik\Workspace\Projects\chess\src\main\java\net.rahka.chess" />
+      <recent name="C:\Users\Erik\Workspace\Projects\chess\src\main\java" />
       <recent name="C:\Users\Erik\Workspace\Projects\chess\src\main\java\net\rahka" />
-    </key>
-    <key name="MoveInnerDialog.RECENTS_KEY">
-      <recent name="net.rahka" />
-      <recent name="board" />
-    </key>
-    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
-      <recent name="net.rahka.chess" />
-      <recent name="" />
-    </key>
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\Erik\Workspace\Projects\chess\src\main\resources" />
-      <recent name="C:\Users\Erik\Workspace\Projects\chess\src\main\java\net\rahka\agent" />
-      <recent name="C:\Users\Erik\Workspace\Projects\chess\src\main\resources\pieces" />
-      <recent name="C:\Users\Erik\Workspace\Projects\chess\src\main\java\visualizer" />
+      <recent name="C:\Users\Erik\Workspace\Projects\chess\src\main" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
-      <recent name="net.rahka.visualizer" />
-      <recent name="net.rahka.utils" />
-      <recent name="net.rahka.agent" />
-      <recent name="visualizer" />
-      <recent name="chess.pieces" />
+      <recent name="net.rahka.chess.agent" />
     </key>
-    <key name="CreateClassDialog.RecentsKey">
-      <recent name="net.rahka.visualizer" />
-      <recent name="net.rahka.chess" />
-      <recent name="chess" />
-      <recent name="board" />
-      <recent name="search" />
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/main/java/net/rahka/chess" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -117,14 +162,14 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Maven.Application">
+  <component name="RunManager" selected="Application.Application">
     <configuration name="Application" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="net.rahka.Application" />
+      <option name="MAIN_CLASS_NAME" value="net.rahka.chess.Application" />
       <module name="chess" />
-      <option name="VM_PARAMETERS" value="--add-modules javafx.base,javafx.graphics,javafx.controls --add-exports javafx.graphics/com.sun.javafx.css=ALL-UNNAMED --module-path &quot;$PROJECT_DIR$/target/libs/&quot;" />
+      <option name="VM_PARAMETERS" value="--add-exports javafx.graphics/com.sun.javafx.application=net.rahka.chess --add-exports javafx.graphics/com.sun.javafx.animation=net.rahka.chess --add-exports javafx.graphics/com.sun.javafx.beans.event=net.rahka.chess --add-exports javafx.graphics/com.sun.javafx.css=net.rahka.chess --add-exports javafx.graphics/com.sun.javafx.cursor=net.rahka.chess --add-exports javafx.graphics/com.sun.javafx.effect=net.rahka.chess --add-exports javafx.graphics/com.sun.javafx.embed=net.rahka.chess --add-exports javafx.graphics/com.sun.javafx.font=net.rahka.chess --add-exports javafx.graphics/com.sun.javafx.geom=net.rahka.chess --add-exports javafx.graphics/com.sun.javafx.geometry=net.rahka.chess --add-exports javafx.graphics/com.sun.javafx.iio=net.rahka.chess --add-exports javafx.graphics/com.sun.javafx.image=net.rahka.chess --add-exports javafx.graphics/com.sun.javafx.menu=net.rahka.chess --add-exports javafx.graphics/com.sun.javafx.perf=net.rahka.chess --add-exports javafx.graphics/com.sun.javafx.print=net.rahka.chess --add-exports javafx.graphics/com.sun.javafx.scene=net.rahka.chess --add-exports javafx.graphics/com.sun.javafx.sg.prism=net.rahka.chess --add-exports javafx.graphics/com.sun.javafx.stage=net.rahka.chess --add-exports javafx.graphics/com.sun.javafx.text=net.rahka.chess --add-exports javafx.graphics/com.sun.javafx.tk=net.rahka.chess --add-exports javafx.graphics/com.sun.javafx.util=net.rahka.chess" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="net.rahka.*" />
+          <option name="PATTERN" value="net.rahka.chess.game.pieces.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -132,86 +177,58 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration default="true" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="net.rahka.Application" />
-      <module name="net.rahka.chess" />
+    <configuration name="Test" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="net.rahka.chess.Application" />
+      <module name="chess" />
+      <option name="PROGRAM_PARAMETERS" value="-b RandomPriorityKilling -w SimpleHeuristic -n 10000" />
+      <option name="VM_PARAMETERS" value="--add-exports javafx.graphics/com.sun.javafx.application=net.rahka.chess --add-exports javafx.graphics/com.sun.javafx.animation=net.rahka.chess --add-exports javafx.graphics/com.sun.javafx.beans.event=net.rahka.chess --add-exports javafx.graphics/com.sun.javafx.css=net.rahka.chess --add-exports javafx.graphics/com.sun.javafx.cursor=net.rahka.chess --add-exports javafx.graphics/com.sun.javafx.effect=net.rahka.chess --add-exports javafx.graphics/com.sun.javafx.embed=net.rahka.chess --add-exports javafx.graphics/com.sun.javafx.font=net.rahka.chess --add-exports javafx.graphics/com.sun.javafx.geom=net.rahka.chess --add-exports javafx.graphics/com.sun.javafx.geometry=net.rahka.chess --add-exports javafx.graphics/com.sun.javafx.iio=net.rahka.chess --add-exports javafx.graphics/com.sun.javafx.image=net.rahka.chess --add-exports javafx.graphics/com.sun.javafx.menu=net.rahka.chess --add-exports javafx.graphics/com.sun.javafx.perf=net.rahka.chess --add-exports javafx.graphics/com.sun.javafx.print=net.rahka.chess --add-exports javafx.graphics/com.sun.javafx.scene=net.rahka.chess --add-exports javafx.graphics/com.sun.javafx.sg.prism=net.rahka.chess --add-exports javafx.graphics/com.sun.javafx.stage=net.rahka.chess --add-exports javafx.graphics/com.sun.javafx.text=net.rahka.chess --add-exports javafx.graphics/com.sun.javafx.tk=net.rahka.chess --add-exports javafx.graphics/com.sun.javafx.util=net.rahka.chess" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="net.rahka.chess.game.pieces.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Unnamed (1)" type="Remote" nameIsGenerated="true">
+      <module name="chess" />
+      <option name="USE_SOCKET_TRANSPORT" value="true" />
+      <option name="SERVER_MODE" value="false" />
+      <option name="SHMEM_ADDRESS" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="8000" />
+      <option name="AUTO_RESTART" value="false" />
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="8000" />
+        <option name="LOCAL" value="false" />
+      </RunnerSettings>
       <method v="2" />
     </configuration>
-    <configuration name="Application" type="MavenRunConfiguration" factoryName="Maven">
-      <MavenSettings>
-        <option name="myGeneralSettings" />
-        <option name="myRunnerSettings" />
-        <option name="myRunnerParameters">
-          <MavenRunnerParameters>
-            <option name="profiles">
-              <set />
-            </option>
-            <option name="goals">
-              <list>
-                <option value="clean" />
-                <option value="javafx:run" />
-              </list>
-            </option>
-            <option name="pomFileName" />
-            <option name="profilesMap">
-              <map />
-            </option>
-            <option name="resolveToWorkspace" value="false" />
-            <option name="workingDirPath" value="$PROJECT_DIR$" />
-          </MavenRunnerParameters>
-        </option>
-      </MavenSettings>
-      <method v="2" />
-    </configuration>
-    <configuration name="chess [javafx:run]" type="MavenRunConfiguration" factoryName="Maven" temporary="true">
-      <MavenSettings>
-        <option name="myGeneralSettings" />
-        <option name="myRunnerSettings">
-          <MavenRunnerSettings>
-            <option name="delegateBuildToMaven" value="false" />
-            <option name="environmentProperties">
-              <map />
-            </option>
-            <option name="jreName" value="#USE_PROJECT_JDK" />
-            <option name="mavenProperties">
-              <map />
-            </option>
-            <option name="passParentEnv" value="true" />
-            <option name="runMavenInBackground" value="true" />
-            <option name="skipTests" value="false" />
-            <option name="vmOptions" value="-DforkMode=never" />
-          </MavenRunnerSettings>
-        </option>
-        <option name="myRunnerParameters">
-          <MavenRunnerParameters>
-            <option name="profiles">
-              <set />
-            </option>
-            <option name="goals">
-              <list>
-                <option value="javafx:run" />
-              </list>
-            </option>
-            <option name="pomFileName" value="pom.xml" />
-            <option name="profilesMap">
-              <map />
-            </option>
-            <option name="resolveToWorkspace" value="false" />
-            <option name="workingDirPath" value="$PROJECT_DIR$" />
-          </MavenRunnerParameters>
-        </option>
-      </MavenSettings>
+    <configuration name="Unnamed" type="Remote" nameIsGenerated="true">
+      <module name="chess" />
+      <option name="USE_SOCKET_TRANSPORT" value="true" />
+      <option name="SERVER_MODE" value="false" />
+      <option name="SHMEM_ADDRESS" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="8000" />
+      <option name="AUTO_RESTART" value="false" />
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="8000" />
+        <option name="LOCAL" value="false" />
+      </RunnerSettings>
       <method v="2" />
     </configuration>
     <list>
+      <item itemvalue="Application.Test" />
       <item itemvalue="Application.Application" />
-      <item itemvalue="Maven.Application" />
-      <item itemvalue="Maven.chess [javafx:run]" />
+      <item itemvalue="Remote.Unnamed (1)" />
+      <item itemvalue="Remote.Unnamed" />
     </list>
     <recent_temporary>
       <list>
         <item itemvalue="Application.Application" />
-        <item itemvalue="Maven.chess [javafx:run]" />
       </list>
     </recent_temporary>
   </component>
@@ -220,58 +237,36 @@
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="a5d6d256-29af-436b-b6b9-e9b8bda87aa4" name="Default Changelist" comment="" />
-      <created>1569068302764</created>
+      <changelist id="e1e462b9-b36d-4329-a34f-4b7ba7b1811c" name="Default Changelist" comment="" />
+      <created>1573822211184</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1569068302764</updated>
-      <workItem from="1569068305432" duration="1219000" />
-      <workItem from="1569102815355" duration="6191000" />
-      <workItem from="1569171224339" duration="5632000" />
-      <workItem from="1569689618167" duration="5400000" />
-      <workItem from="1569793690107" duration="49000" />
-      <workItem from="1570134123333" duration="8013000" />
-      <workItem from="1570190999177" duration="31140000" />
-      <workItem from="1570281478172" duration="4949000" />
-      <workItem from="1570289539256" duration="696000" />
-      <workItem from="1570290259037" duration="524000" />
-      <workItem from="1570290799312" duration="10110000" />
-      <workItem from="1570360454615" duration="40532000" />
-      <workItem from="1570624057668" duration="11389000" />
-      <workItem from="1570733776388" duration="12890000" />
-      <workItem from="1570795448610" duration="14207000" />
-      <workItem from="1570886142174" duration="317000" />
-      <workItem from="1570886627405" duration="627000" />
-      <workItem from="1570921430238" duration="5860000" />
-      <workItem from="1570974451744" duration="3179000" />
-      <workItem from="1570978610174" duration="109000" />
-      <workItem from="1570994388902" duration="11291000" />
-      <workItem from="1571254123569" duration="10810000" />
-      <workItem from="1571338253354" duration="5705000" />
-      <workItem from="1571396821012" duration="1521000" />
-      <workItem from="1571490046294" duration="9231000" />
-      <workItem from="1571516311552" duration="6852000" />
-      <workItem from="1571532090578" duration="180000" />
-      <workItem from="1571532329750" duration="1518000" />
-      <workItem from="1571568413334" duration="17590000" />
-      <workItem from="1571648384792" duration="30000" />
-      <workItem from="1571673089285" duration="5628000" />
-      <workItem from="1571946468963" duration="5191000" />
-      <workItem from="1571992539582" duration="406000" />
-      <workItem from="1571992983842" duration="26889000" />
-      <workItem from="1572347157433" duration="28000" />
-      <workItem from="1572628581372" duration="14607000" />
-      <workItem from="1572779410276" duration="23720000" />
-      <workItem from="1573402044907" duration="4810000" />
-      <workItem from="1573414470091" duration="41000" />
-      <workItem from="1573567886322" duration="309000" />
-      <workItem from="1573579125126" duration="9731000" />
-      <workItem from="1573664160416" duration="19253000" />
-      <workItem from="1573745499525" duration="1931000" />
+      <updated>1573822211184</updated>
+      <workItem from="1573822218585" duration="2421000" />
+      <workItem from="1573826386826" duration="21241000" />
+      <workItem from="1573922244072" duration="1232000" />
+      <workItem from="1573923539890" duration="6132000" />
+      <workItem from="1573930570881" duration="7029000" />
+      <workItem from="1574083650446" duration="190000" />
+      <workItem from="1574088548885" duration="1287000" />
+      <workItem from="1574195821868" duration="601000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
 </project>
