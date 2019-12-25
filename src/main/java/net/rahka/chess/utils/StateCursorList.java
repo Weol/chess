@@ -1,28 +1,27 @@
 package net.rahka.chess.utils;
 
-public class CursorList<T> {
+public class StateCursorList {
 
-	private Cursor<T> cursor;
-	private Node<T> tail;
-	private Node<T> head;
+	private Cursor cursor;
+	private Node tail;
+	private Node head;
 	private int size;
 
-	public CursorList() {
+	public StateCursorList() {
 		size = 0;
 
-		cursor = new Cursor<>();
+		cursor = new Cursor();
 	}
 
-	public void push(T t) {
+	public void push(long[] t) {
 		if (tail == null) {
-			tail = new Node<>();
+			tail = new Node();
 			tail.payload = t;
 
-			cursor.current = new Node<>();
-			cursor.current.next = tail;
-			tail.previous = cursor.current;
+			cursor.current = tail;
+			head = tail;
 		} else {
-			tail.next = new Node<>();
+			tail.next = new Node();
 			tail.next.payload = t;
 			tail.next.previous = tail;
 			tail = tail.next;
@@ -37,16 +36,16 @@ public class CursorList<T> {
 	public void clear() {
 		tail = null;
 		size = 0;
-		cursor = new Cursor<>();
+		cursor = new Cursor();
 	}
 
-	public Cursor<T> cursor() {
+	public Cursor cursor() {
 		return cursor;
 	}
 
-	public class Cursor<T> {
+	public class Cursor {
 
-		private Node<T> current;
+		private Node current;
 
 		private int index;
 
@@ -55,28 +54,17 @@ public class CursorList<T> {
 		}
 
 		public void reset() {
-			jump(0);
+			index = 0;
+			current = head;
 		}
 
-		public void jump(int index) {
-			if (index < 0 || index > size - 1) throw new IndexOutOfBoundsException();
-
-			while (this.index != index) {
-				if (this.index > index) {
-					previous();
-				} else {
-					next();
-				}
-			}
-		}
-
-		public T current() {
+		public long[] current() {
 			if (!hasCurrent()) throw new NullPointerException("Current is null");
 
 			return current.payload;
 		}
 
-		public T next() {
+		public long[] next() {
 			if (!hasNext()) throw new NullPointerException("Previous is null");
 
 			index++;
@@ -84,7 +72,7 @@ public class CursorList<T> {
 			return current.payload;
 		}
 
-		public T previous() {
+		public long[] previous() {
 			if (!hasPrevious()) throw new NullPointerException("Previous is null");
 
 			index--;
@@ -106,11 +94,11 @@ public class CursorList<T> {
 
 	}
 
-	private class Node<T> {
+	private class Node {
 
-		private T payload;
-		private Node<T> next;
-		private Node<T> previous;
+		private long[] payload;
+		private Node next;
+		private Node previous;
 
 	}
 

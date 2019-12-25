@@ -1,21 +1,15 @@
 package net.rahka.chess.game;
 
 import lombok.Getter;
-import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import net.rahka.chess.BoardConfig;
 import net.rahka.chess.agent.Agent;
-import net.rahka.chess.game.pieces.King;
-import net.rahka.chess.game.pieces.Move;
-import net.rahka.chess.game.pieces.Piece;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedList;
-import java.util.Objects;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.function.Consumer;
 
 public class Chess {
 
@@ -27,131 +21,204 @@ public class Chess {
 
 	private ExecutorService handlerExecutor = Executors.newSingleThreadScheduledExecutor();
 
-	private LinkedList<Consumer<Move>> onMoveHandlers = new LinkedList<>();
+	@Setter @Getter
+	private BoardStateChangeHandler boardChangeHandler;
 
-	public Chess(BoardConfig configuration, Agent whiteAgent, Agent blackAgent) {
-		board = new Board(configuration);
+	public Chess(Agent whiteAgent, Agent blackAgent) {
+		board = new Board();
 
 		this.blackAgent = whiteAgent;
 		this.whiteAgent = blackAgent;
 	}
 
-	private @NonNull State getState() {
-		var state = new State();
-		state.board = board;
-
-		state.whitePieceCount = board.getWhitePieces().size();
-		state.blackPieceCount = board.getBlackPieces().size();
-		state.totalPieceCount = board.getAllPieces().size();
-
-		return state;
-	}
-
-	public @NonNull Player start() {
+	public Player start() {
 		board.reset();
 
 		Player winner = null;
-		while (winner == null) {
+		while (winner == null && !Thread.currentThread().isInterrupted()) {
 			{
-				var move = whiteAgent.getMove(Player.WHITE, getAllLegalMoves(Player.WHITE), getState());
-				winner = move(move);
+				var move = whiteAgent.getMove(Player.WHITE, board.getAllLegalMoves(Player.WHITE), new State(board.getState()));
+
+				int fromI = Long.numberOfTrailingZeros(board.getPieces(move.piece) & move.move);
+				int toI = Long.numberOfTrailingZeros((board.getPieces(move.piece) & move.move) ^ move.move);
+
+				board.move(move.piece, move.move);
+
+				System.out.printf("White moved %s from (%d, %d) to (%d, %d)\n", move.piece, fromI % 8, fromI / 8, toI % 8, toI / 8);
+
+				runBoardChangeHandler();
+				if (board.getPieces(Piece.BLACK_KING) == 0) {
+					winner = Player.WHITE;
+				}
 			}
 
 			if (winner == null) {
-				var move = blackAgent.getMove(Player.BLACK, getAllLegalMoves(Player.BLACK), getState());
-				winner = move(move);
+				var move = blackAgent.getMove(Player.BLACK, board.getAllLegalMoves(Player.BLACK), new State(board.getState()));
+
+				int fromI = Long.numberOfLeadingZeros(board.getPieces(move.piece) & move.move);
+				int toI = Long.numberOfLeadingZeros((board.getPieces(move.piece) & move.move) ^ move.move);
+
+				System.out.printf("Black moved %s from (%d, %d) to (%d, %d)\n", move.piece, fromI % 8, fromI / 8, toI % 8, toI / 8);
+
+				board.move(move.piece, move.move);
+
+				runBoardChangeHandler();
+				if (board.getPieces(Piece.WHITE_KING) == 0) {
+					winner = Player.BLACK;
+				}
 			}
 		}
 		return winner;
 	}
 
-	private Collection<Move> getAllLegalMoves(Player player) {
-		final var pieces = (player == Player.WHITE) ? board.getWhitePieces() : board.getBlackPieces();
-		final var moves = new ArrayList<Move>(100);
-
-		for (Piece piece : pieces) {
-			piece.getLegalMovements(getBoard()).stream().filter(Objects::nonNull).forEach(moves::add);
+	private void runBoardChangeHandler() {
+		long[] state = new long[12];
+		for (Piece piece : Piece.values()) {
+			state[piece.index] = board.getPieces(piece);
 		}
 
-		return moves;
-	}
-
-	public synchronized Player move(final Move move) {
-		var piece = move.piece;
-
-		board.unsetPieceAt(move.fromX, move.fromY);
-
-		piece.setX(move.toX);
-		piece.setY(move.toY);
-
-		var victim = board.setPieceAt(piece, move.toX, move.toY);
-
-		//var pieceName = piece.toString().replaceAll(".+\\.", "").replaceAll("@.+", "");
-		//System.out.printf("%s moved %s from (%d, %d) to (%d, %d)\n", piece.getPlayer().toString(), pieceName, move.fromX, move.fromY, move.toX, move.toY);
-
-		handlerExecutor.execute(() -> onMoveHandlers.forEach(handler -> handler.accept(move)));
-
-		if (victim instanceof King) {
-			return Player.not(victim.getPlayer());
-		}
-		return null;
-	}
-
-	public void addOnMoveHandler(Consumer<Move> handler) {
-		onMoveHandlers.add(handler);
-	}
-
-	public void removeOnMoveHandler(Consumer<Move> handler) {
-		onMoveHandlers.remove(handler);
+		if (boardChangeHandler != null) handlerExecutor.submit(() -> {
+			boardChangeHandler.onBoardStateChange(state);
+		});
 	}
 
 	public static class State {
 
-		public boolean terminal = false;
+		private final int[] remainingPieces;
 
-		public int whitePieceCount, blackPieceCount, totalPieceCount;
+		@Getter(lazy = true)
+		private final int remainingWhitePieces = calculateRemainingWhitePieces();
 
-		public Board board;
+		@Getter(lazy = true)
+		private final int remainingBlackPieces = calculateRemainingBlackPieces();
 
-		public State expand(Move move) {
-			var newState = new State();
-			newState.whitePieceCount = whitePieceCount;
-			newState.blackPieceCount = blackPieceCount;
+		@Getter(lazy = true)
+		private final long allBlackPieces = calculateAllBlackPieces();
 
-			{
-				var newBoard = new Board(board);
+		@Getter(lazy = true)
+		private final long allWhitePieces = calculateAllWhitePieces();
 
-				var piece = move.piece;
+		@Getter(lazy = true)
+		private final Board board = createBoard();
 
-				newBoard.unsetPieceAt(move.fromX, move.fromY);
-				var victim = newBoard.setPieceAt(piece, move.toX, move.toY);
+		@Getter
+		private final long[] state;
 
-				newState.board = newBoard;
+		public State(long[] state, int[] remainingPieces) {
+			this.state = state;
+			this.remainingPieces = remainingPieces;
+		}
 
-				if (victim != null) {
-					if (victim.getPlayer() == Player.WHITE) whitePieceCount--;
-					if (victim.getPlayer() == Player.BLACK) blackPieceCount--;
-				}
+		public State(long[] state) {
+			this(state, new int[] {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1});
+		}
 
-				if (victim instanceof King) {
-					newState.terminal = true;
+		public State expand(Piece piece, long move) {
+			long[] newState = new long[] {
+					state[0],
+					state[1],
+					state[2],
+					state[3],
+					state[4],
+					state[5],
+					state[6],
+					state[7],
+					state[8],
+					state[9],
+					state[10],
+					state[11],
+			};
+
+			int[] newPieceCounts = new int[] {
+					remainingPieces[0],
+					remainingPieces[1],
+					remainingPieces[2],
+					remainingPieces[3],
+					remainingPieces[4],
+					remainingPieces[5],
+					remainingPieces[6],
+					remainingPieces[7],
+					remainingPieces[8],
+					remainingPieces[9],
+					remainingPieces[10],
+					remainingPieces[11],
+			};
+
+			Piece[] adversaries = piece.adversaries();
+
+			long victim = (move & newState[piece.index]) ^ move;
+
+			newState[piece.index] ^= move;
+			for (Piece adversary : adversaries) {
+				if ((newState[adversary.index] & victim) != 0) {
+					newState[adversary.index] = newState[adversary.index] ^ victim;
+					newPieceCounts[adversary.index]--;
 				}
 			}
 
-			newState.totalPieceCount = blackPieceCount + whitePieceCount;
+			return new State(newState, newPieceCounts);
+		}
 
-			return newState;
+		private long calculateAllBlackPieces() {
+			long pieces = 0;
+			for (Piece piece : Piece.getBlack()) {
+				pieces |= state[piece.index];
+			}
+			return pieces;
+		}
+
+		private long calculateAllWhitePieces() {
+			long pieces = 0;
+			for (Piece piece : Piece.getWhite()) {
+				pieces |= state[piece.index];
+			}
+			return pieces;
+		}
+
+		private int calculateRemainingBlackPieces() {
+			return Long.bitCount(getAllBlackPieces());
+		}
+
+		private int calculateRemainingWhitePieces() {
+			return Long.bitCount(getAllWhitePieces());
+		}
+
+		public int remainingPieces(Player player) {
+			if (player.isWhite()) {
+				return getRemainingWhitePieces();
+			} else {
+				return getRemainingBlackPieces();
+			}
+		}
+
+		public int remainingPieces(Piece piece) {
+			if (remainingPieces[piece.index] < 0) {
+				remainingPieces[piece.index] = Long.bitCount(state[piece.index]);
+			}
+
+			return remainingPieces[piece.index];
+		}
+
+		public Piece victim(Piece attacker, long move) {
+			long victim = (move & state[attacker.index]) ^ move;
+			for (Piece adversary : attacker.adversaries()) {
+				if ((victim & state[adversary.index]) != 0)	{
+					return adversary;
+				}
+			}
+			return null;
+		}
+
+		public boolean isTerminal() {
+			return (remainingPieces(Piece.BLACK_KING) == 0 || remainingPieces(Piece.WHITE_KING) == 0);
+		}
+
+		private Board createBoard() {
+			return new Board(state);
 		}
 
 		public Collection<Move> getAvailableMoves(Player player) {
-			final var pieces = (player == Player.WHITE) ? board.getWhitePieces() : board.getBlackPieces();
-			final var moves = new ArrayList<Move>(100);
-
-			for (Piece piece : pieces) {
-				piece.getLegalMovements(board).stream().filter(Objects::nonNull).forEach(moves::add);
-			}
-
-			return moves;
+			return getBoard().getAllLegalMoves(player);
 		}
 
 	}

@@ -10,16 +10,32 @@ public class ChessBoard extends Canvas {
 	private static final Color WHITE_SQUARE_COLOR = Color.LIGHTGRAY;
 	private static final Color BLACK_SQUARE_COLOR = Color.DARKGRAY;
 
-	@NonNull @Getter
-	private int dimension;
+	@Getter
+	private final int dimension;
 
-	public ChessBoard(@NonNull int dimension) {
+	private boolean[] markedSquares = new boolean[64];
+
+	public ChessBoard(int dimension) {
 		this.dimension = dimension;
 
 		widthProperty().addListener((ignored) -> paint());
 		heightProperty().addListener((ignored) -> paint());
 
 		paint();
+	}
+
+	public void markSquare(int x, int y) {
+		markedSquares[y * dimension + x] = true;
+		paint();
+	}
+
+	public void unmarkSquare(int x, int y) {
+		markedSquares[y * dimension + x] = false;
+		paint();
+	}
+
+	public void unmarkAll() {
+		markedSquares = new boolean[64];
 	}
 
 	public void paint() {
@@ -34,8 +50,12 @@ public class ChessBoard extends Canvas {
 
 				g.setFill(squareColor);
 				g.fillRect(x * squareSize, y * squareSize, squareSize, squareSize);
+
+				if (markedSquares[y * dimension + x]) {
+					g.setFill(Color.RED);
+					g.fillRect(x * squareSize + 5, y * squareSize + 5, squareSize - 10, squareSize - 10);
+				}
 			}
 		}
 	}
-
 }

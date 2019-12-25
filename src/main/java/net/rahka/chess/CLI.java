@@ -7,7 +7,7 @@ import net.rahka.chess.game.Player;
 public class CLI {
 
     public static void run(Agent blackAgent, Agent whiteAgent, int games) {
-        Chess chess = new Chess(BoardConfig.DEFAULT, whiteAgent, blackAgent);
+        Chess chess = new Chess(whiteAgent, blackAgent);
 
         float whiteWins = 0, blackWins = 0;
         for (int i = 0; i < games; i++) {

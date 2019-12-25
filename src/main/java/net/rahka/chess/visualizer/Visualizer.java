@@ -1,72 +1,57 @@
 package net.rahka.chess.visualizer;
 
-import javafx.animation.AnimationTimer;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import net.rahka.chess.AgentHolder;
 import net.rahka.chess.IO;
-import net.rahka.chess.BoardConfig;
-import net.rahka.chess.game.Player;
-import net.rahka.chess.game.pieces.Bishop;
-import net.rahka.chess.game.pieces.King;
-import net.rahka.chess.game.pieces.Knight;
-import net.rahka.chess.game.pieces.Move;
-import net.rahka.chess.game.pieces.Pawn;
-import net.rahka.chess.game.pieces.Piece;
-import net.rahka.chess.game.pieces.Queen;
-import net.rahka.chess.game.pieces.Rook;
+import net.rahka.chess.game.Board;
+import net.rahka.chess.game.Move;
+import net.rahka.chess.game.Piece;
 import net.rahka.chess.utils.AdjustableTimer;
-import net.rahka.chess.utils.CursorList;
+import net.rahka.chess.utils.StateCursorList;
 
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.Collection;
+import java.util.List;
 
 public abstract class Visualizer extends Pane {
 
 	private static int PIECE_PADDING = 10;
 
 	private static IO.Images getPieceImage(Piece piece) {
-		if (piece.getPlayer() == Player.WHITE) {
-			if (piece.getClass().isAssignableFrom(Pawn.class)) {
+		switch (piece) {
+			case WHITE_PAWN:
 				return IO.Images.WHITE_PAWN;
-			} else if (piece.getClass().isAssignableFrom(Bishop.class)) {
-				return IO.Images.WHITE_BISHOP;
-			} else if (piece.getClass().isAssignableFrom(King.class)) {
-				return IO.Images.WHITE_KING;
-			} else if (piece.getClass().isAssignableFrom(Queen.class)) {
-				return IO.Images.WHITE_QUEEN;
-			} else if (piece.getClass().isAssignableFrom(Knight.class)) {
-				return IO.Images.WHITE_KNIGHT;
-			} else if (piece.getClass().isAssignableFrom(Rook.class)) {
+			case WHITE_ROOK:
 				return IO.Images.WHITE_ROOK;
-			}
-		} else {
-			if (piece.getClass().isAssignableFrom(Pawn.class)) {
+			case WHITE_KNIGHT:
+				return IO.Images.WHITE_KNIGHT;
+			case WHITE_BISHOP:
+				return IO.Images.WHITE_BISHOP;
+			case WHITE_QUEEN:
+				return IO.Images.WHITE_QUEEN;
+			case WHITE_KING:
+				return IO.Images.WHITE_KING;
+			case BLACK_PAWN:
 				return IO.Images.BLACK_PAWN;
-			} else if (piece.getClass().isAssignableFrom(Bishop.class)) {
-				return IO.Images.BLACK_BISHOP;
-			} else if (piece.getClass().isAssignableFrom(King.class)) {
-				return IO.Images.BLACK_KING;
-			} else if (piece.getClass().isAssignableFrom(Queen.class)) {
-				return IO.Images.BLACK_QUEEN;
-			} else if (piece.getClass().isAssignableFrom(Knight.class)) {
-				return IO.Images.BLACK_KNIGHT;
-			} else if (piece.getClass().isAssignableFrom(Rook.class)) {
+			case BLACK_ROOK:
 				return IO.Images.BLACK_ROOK;
-			}
+			case BLACK_KNIGHT:
+				return IO.Images.BLACK_KNIGHT;
+			case BLACK_BISHOP:
+				return IO.Images.BLACK_BISHOP;
+			case BLACK_QUEEN:
+				return IO.Images.BLACK_QUEEN;
+			case BLACK_KING:
+				return IO.Images.BLACK_KING;
 		}
 		return IO.Images.BLACK_ROOK;
 	}
@@ -74,12 +59,10 @@ public abstract class Visualizer extends Pane {
 	//Views
 	private final ChessBoard boardView;
 	private final PlayBackView playBackView;
-	private final Group piecesGroup;
 
-	private final BoardConfig boardConfiguration;
-	private final BlockingQueue<Animation> animations;
-	private final Map<Piece, ChessPieceView> imageViews;
-	private final CursorList<Move> moves;
+	private final ChessPieceView[] imageViews;
+	private final StateCursorList states;
+	private final long[] initialState;
 
 	//State
 	private Thread executionThread;
@@ -87,27 +70,33 @@ public abstract class Visualizer extends Pane {
 	//Concurrency
 	private AdjustableTimer moveTimer = new AdjustableTimer();
 
-	public Visualizer(BoardConfig config, AgentHolder[] agentClasses) {
-		boardConfiguration = config;
-		animations = new LinkedBlockingQueue<>(1);
-		moves = new CursorList<>();
-		imageViews = new HashMap<>();
+	public Visualizer(AgentHolder[] agentClasses, long[] initialState) {
+		this.initialState = initialState;
+		states = new StateCursorList();
+		imageViews = new ChessPieceView[8*4];
 
 		playBackView = new PlayBackView(agentClasses);
 		playBackView.prefWidthProperty().bind(widthProperty());
 		playBackView.setPrefHeight(30);
 
-		boardView = new ChessBoard(config.getDimensions());
+		boardView = new ChessBoard(8);
 		boardView.layoutYProperty().bind(playBackView.heightProperty());
 		boardView.layoutXProperty().bind(widthProperty().divide(2).subtract(boardView.widthProperty().divide(2)));
 		boardView.setWidth(Math.min(getWidth(), getHeight() - playBackView.getHeight()));
 		boardView.setHeight(Math.min(getWidth(), getHeight() - playBackView.getHeight()));
 
 		//Group that holds all the chess piece ImageViews
-		piecesGroup = new Group();
+		Group piecesGroup = new Group();
 		piecesGroup.setManaged(false);
 		piecesGroup.translateXProperty().bind(boardView.layoutXProperty().add(PIECE_PADDING));
 		piecesGroup.translateYProperty().bind(boardView.layoutYProperty().add(PIECE_PADDING));
+
+		for (int i = 0; i < imageViews.length; i++) {
+			imageViews[i] = new ChessPieceView();
+			final var view = imageViews[i];
+			view.setOnMouseClicked((ignored) -> onChessPieceClicked(view.getPiece(), view.getBoardX(), view.getBoardY()));
+			piecesGroup.getChildren().add(view);
+		}
 
 		getChildren().add(playBackView);
 		getChildren().add(boardView);
@@ -117,16 +106,28 @@ public abstract class Visualizer extends Pane {
 		heightProperty().addListener((ignored) -> resetPieces());
 
 		reset(true);
+	}
 
-		resetPieces();
+	private void onChessPieceClicked(Piece piece, int x, int y) {
+		if (piece == null) return;
 
-		var animator = new AnimationTimer() {
-			@Override
-			public void handle(long now) {
-				Visualizer.this.animate();
+		Board board = new Board(states.cursor().current());
+		long kernel = (-0x8000000000000000L >>> (63 - (y * 8 + x)));
+
+		Collection<Move> moves = board.getAllLegalMoves(piece, kernel);
+
+		long positions = 0;
+		for (Move move : moves) {
+			positions |= move.move;
+		}
+
+		boardView.unmarkAll();
+		for (int i = 0; i < 64; i++) {
+			long k = (-0x8000000000000000L >>> (63 - i));
+			if ((positions & k) != 0) {
+				boardView.markSquare(i % 8, i / 8);
 			}
-		};
-		animator.start();
+		}
 	}
 
 	private long getMoveInterval() {
@@ -142,7 +143,7 @@ public abstract class Visualizer extends Pane {
 			moveTimer.start(() -> {
 				nextMove();
 
-				if (!moves.cursor().hasNext() && !executionThread.isAlive()) {
+				if (!states.cursor().hasNext() && !executionThread.isAlive()) {
 					pause();
 				}
 			}, getMoveInterval());
@@ -174,17 +175,14 @@ public abstract class Visualizer extends Pane {
 
 	protected abstract void onBlackAgentChosen(AgentHolder agentHolder);
 
-
 	private void resetPieces() {
 		var size = Math.min(getWidth(), getHeight() - playBackView.getHeight());
 		boardView.setWidth(size);
 		boardView.setHeight(size);
 
-		for (Map.Entry<Piece, ChessPieceView> entry : imageViews.entrySet()) {
-			var view = entry.getValue();
-
-			view.setFitWidth(size / boardConfiguration.getDimensions() - PIECE_PADDING * 2);
-			view.setFitHeight(size / boardConfiguration.getDimensions() - PIECE_PADDING * 2);
+		for (ChessPieceView view : imageViews) {
+			view.setFitWidth(size / 8 - PIECE_PADDING * 2);
+			view.setFitHeight(size / 8 - PIECE_PADDING * 2);
 			view.setX((view.getFitWidth() + PIECE_PADDING * 2) * view.getBoardX());
 			view.setY((view.getFitHeight() + PIECE_PADDING * 2) * view.getBoardY());
 		}
@@ -192,89 +190,63 @@ public abstract class Visualizer extends Pane {
 		boardView.paint();
 	}
 
-	public synchronized void reset(boolean hard) {
-		if (hard) {
-			moves.clear();
-			playBackView.resetButton.setVisible(false);
-		} else {
-			moves.cursor().reset();
+	public void reset(boolean hard) {
+		synchronized (this) {
+			if (hard) {
+				states.clear();
+				states.push(initialState);
+				changeState(states.cursor().current());
+				playBackView.resetButton.setVisible(false);
+			} else {
+				states.cursor().reset();
+				changeState(states.cursor().current());
+			}
+
+			resetPieces();
+		}
+	}
+
+	private void previousMove() {
+		synchronized (this) {
+			if (states.cursor().hasPrevious()) {
+				changeState(states.cursor().previous());
+			}
+		}
+	}
+
+	private void nextMove() {
+		synchronized (this) {
+			if (states.cursor().hasNext()) {
+				changeState(states.cursor().next());
+			}
+		}
+	}
+
+	private void changeState(long[] state) {
+		for (ChessPieceView imageView : imageViews) {
+			imageView.setVisible(false);
 		}
 
-		animations.clear();
-		piecesGroup.getChildren().clear();
-		imageViews.clear();
-
-		var pieces = boardConfiguration.configurations();
-		while (pieces.hasNext()) {
-			var pieceConfig = pieces.next();
-			var piece = pieceConfig.getPiece();
-			var view = new ChessPieceView(IO.image(getPieceImage(piece)), pieceConfig.getStartX(), pieceConfig.getStartY());
-
-			imageViews.put(piece, view);
-
-			piecesGroup.getChildren().add(view);
+		int index = 0;
+		for (Piece piece : Piece.values()) {
+			long pieces = state[piece.index];
+			for (int i = 0; i < 64; i++) {
+				long kernel = (-0x8000000000000000L >>> (63 - i));
+				if ((pieces & kernel) != 0) {
+					var view = imageViews[index++];
+					view.setVisible(true);
+					view.setPiece(piece);
+					view.setBoardX(i % 8);
+					view.setBoardY(i / 8);
+				}
+			}
 		}
 
 		resetPieces();
 	}
 
-	private  void animate() {
-		var iterator = animations.iterator();
-		while (iterator.hasNext()) {
-			var animation = iterator.next();
-			var move = animation.move;
-			var from = imageViews.get(animation.move.piece);
-
-			var toX = (from.getFitWidth() + PIECE_PADDING * 2) * (animation.reverse ? move.fromX : move.toX);
-			var toY = (from.getFitHeight() + PIECE_PADDING * 2) * (animation.reverse ? move.fromY : move.toY);
-
-			var stepSize = Math.min(boardView.getWidth(), boardView.getHeight()) / Math.max(getMoveInterval(), 50);
-
-			var deltaX = Math.min(Math.abs(toX - from.getX()), stepSize) * Math.signum(toX - from.getX());
-			var deltaY = Math.min(Math.abs(toY - from.getY()), stepSize) * Math.signum(toY - from.getY());
-
-			from.setX(from.getX() + deltaX);
-			from.setY(from.getY() + deltaY);
-
-			if (Math.abs(toX - from.getX()) < 0.1 && Math.abs(toY - from.getY()) < 0.1) {
-				iterator.remove();
-
-				if (move.victim != null) {
-					imageViews.get(animation.move.victim).setVisible(animation.reverse);
-				}
-			}
-		}
-	}
-
-	private void previousMove() {
-		if (moves.cursor().hasPrevious() && animations.remainingCapacity() > 0) {
-			var move = moves.cursor().current();
-			var from = imageViews.get(move.piece);
-
-			from.boardX = move.fromX;
-			from.boardY = move.fromY;
-
-			animations.add(new Animation(move, true));
-
-			moves.cursor().previous();
-		}
-	}
-
-	private synchronized void nextMove() {
-		if (moves.cursor().hasNext() && animations.remainingCapacity() > 0) {
-			Move move = moves.cursor().next();
-
-			final var from = imageViews.get(move.piece);
-
-			from.boardX = move.toX;
-			from.boardY = move.toY;
-
-			animations.add(new Animation(move));
-		}
-	}
-
-	public synchronized void onMove(Move move) {
-		moves.push(move);
+	public synchronized void onBoardStateChanged(long[] state) {
+		states.push(state);
 	}
 
 	private void onPreviousButtonPressed() {
@@ -298,14 +270,14 @@ public abstract class Visualizer extends Pane {
 	}
 
 	private void onStartStopButtonPressed() {
-		pause();
-
 		if (executionThread != null && executionThread.isAlive()) {
+			pause();
 			executionThread.interrupt();
 			executionThread = null;
 			reset(true);
 			playBackView.startStopButton.setImage(IO.image(IO.Images.EXECUTE));
-		} else if (moves.size() > 0) {
+		} else if (states.size() > 1) {
+			pause();
 			reset(true);
 			playBackView.startStopButton.setImage(IO.image(IO.Images.EXECUTE));
 		} else {
@@ -314,26 +286,20 @@ public abstract class Visualizer extends Pane {
 		}
 	}
 
-	@AllArgsConstructor
-	@RequiredArgsConstructor
-	private static class Animation {
-
-		@NonNull @Getter
-		private Move move;
-
-		private boolean reverse = false;
-
-	}
-
 	private static class ChessPieceView extends ImageView {
 
-		@NonNull @Getter
+		@Getter @Setter
 		private int boardX, boardY;
 
-		ChessPieceView(Image image, int x, int y) {
-			super(image);
-			boardX = x;
-			boardY = y;
+		private Piece piece;
+
+		public Piece getPiece() {
+			return piece;
+		}
+
+		public void setPiece(Piece piece) {
+			this.piece = piece;
+			setImage(IO.image(getPieceImage(piece)));
 		}
 
 	}
@@ -448,6 +414,4 @@ public abstract class Visualizer extends Pane {
 		}
 
 	}
-
-
 }

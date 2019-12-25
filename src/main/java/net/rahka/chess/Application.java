@@ -11,9 +11,8 @@ import net.rahka.paramaters.CollectionFlag;
 import net.rahka.paramaters.ParameterInterpreter;
 import net.rahka.chess.visualizer.Visualizer;
 
-import java.util.Date;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Supplier;
 
 
@@ -26,7 +25,7 @@ public class Application extends javafx.application.Application {
 			agents.put("Random", RandomAgent::new);
 			agents.put("RandomKilling", RandomKillingAgent::new);
 			agents.put("RandomPriorityKilling", RandomPriorityKillingAgent::new);
-			agents.put("SimpleHeuristic", SimpleHeuristicAgent::new);
+			agents.put("SimpleHeuristic", GreedyHeuristicAgent::new);
 			agents.put("MiniMax", MiniMaxAgent::new);
 
 			ParameterInterpreter interpreter = new ParameterInterpreter(
@@ -55,7 +54,7 @@ public class Application extends javafx.application.Application {
 		var whiteAgent = new MiniMaxAgent();
 		var blackAGent = new MiniMaxAgent();
 
-		chess = new Chess(BoardConfig.DEFAULT, whiteAgent, blackAGent);
+		chess = new Chess(whiteAgent, blackAGent);
 	}
 
 	@Override
@@ -63,7 +62,7 @@ public class Application extends javafx.application.Application {
 		javafx.application.Application.setUserAgentStylesheet(javafx.application.Application.STYLESHEET_MODENA);
 		StyleManager.getInstance().addUserAgentStylesheet("application.css");
 
-		stage.setTitle("Visualizer");
+		stage.setTitle("Chess");
 		stage.setMinWidth(700);
 		stage.setMinHeight(700);
 		stage.setWidth(700);
@@ -73,17 +72,21 @@ public class Application extends javafx.application.Application {
 			new AgentHolder(RandomPriorityKillingAgent::new, "Random priority killing"),
 			new AgentHolder(RandomAgent::new, "Random"),
 			new AgentHolder(RandomKillingAgent::new, "Random killing"),
-			new AgentHolder(SimpleHeuristicAgent::new, "Simple heuristic"),
+			new AgentHolder(GreedyHeuristicAgent::new, "Greedy heuristic"),
 			new AgentHolder(MiniMaxAgent::new, "MiniMax"),
 		};
 
-		var visualizer = new Visualizer(BoardConfig.DEFAULT, agentClasses) {
+		var visualizer = new Visualizer(agentClasses, Arrays.copyOf(chess.getBoard().getState(), 12)) {
 
 			@Override
 			protected void execute() {
 				System.out.println("Starting chess match!");
 				Player winner = chess.start();
-				System.out.printf("Chess match finished! %s won!\n", winner.toString());
+				if (winner != null) {
+					System.out.printf("Chess match finished! %s won!\n", winner.toString());
+				} else {
+					System.out.println("Chess match interrupted!");
+				}
 			}
 
 			@Override
@@ -97,7 +100,7 @@ public class Application extends javafx.application.Application {
 			}
 
 		};
-		chess.addOnMoveHandler(visualizer::onMove);
+		chess.setBoardChangeHandler(visualizer::onBoardStateChanged);
 
 		stage.setScene(new Scene(visualizer));
 		stage.show();
