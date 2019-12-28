@@ -68,9 +68,7 @@ public class ParameterInterpretation {
      */
 	protected void addFlag(Flag flag, Object object) {
 		flags.put(flag.getName(), object);
-		if (required.contains(flag)) {
-		    required.remove(flag);
-        }
+		required.remove(flag);
 	}
 
     /**

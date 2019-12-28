@@ -6,10 +6,10 @@ import javafx.stage.Stage;
 import net.rahka.chess.agent.*;
 import net.rahka.chess.game.Chess;
 import net.rahka.chess.game.Player;
-import net.rahka.paramaters.FunctionFlag;
-import net.rahka.paramaters.CollectionFlag;
-import net.rahka.paramaters.ParameterInterpreter;
 import net.rahka.chess.visualizer.Visualizer;
+import net.rahka.paramaters.CollectionFlag;
+import net.rahka.paramaters.FunctionFlag;
+import net.rahka.paramaters.ParameterInterpreter;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -35,8 +35,8 @@ public class Application extends javafx.application.Application {
 			);
 			var interpretation = interpreter.intepret(args);
 
-			var blackAgent = agents.get((String) interpretation.get("black"));
-			var whiteAgent = agents.get((String) interpretation.get("white"));
+			var blackAgent = agents.get(interpretation.get("black"));
+			var whiteAgent = agents.get(interpretation.get("white"));
 			int games = interpretation.get("number");
 
 			CLI.run(blackAgent.get(), whiteAgent.get(), games);
@@ -69,11 +69,11 @@ public class Application extends javafx.application.Application {
 		stage.setHeight(700);
 
 		var agentClasses = new AgentHolder[] {
+			new AgentHolder(MiniMaxAgent::new, "MiniMax"),
 			new AgentHolder(RandomPriorityKillingAgent::new, "Random priority killing"),
 			new AgentHolder(RandomAgent::new, "Random"),
 			new AgentHolder(RandomKillingAgent::new, "Random killing"),
-			new AgentHolder(GreedyHeuristicAgent::new, "Greedy heuristic"),
-			new AgentHolder(MiniMaxAgent::new, "MiniMax"),
+			new AgentHolder(GreedyHeuristicAgent::new, "Greedy heuristic")
 		};
 
 		var visualizer = new Visualizer(agentClasses, Arrays.copyOf(chess.getBoard().getState(), 12)) {

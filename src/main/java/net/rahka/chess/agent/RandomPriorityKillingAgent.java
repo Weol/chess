@@ -4,9 +4,11 @@ import net.rahka.chess.game.Chess;
 import net.rahka.chess.game.Move;
 import net.rahka.chess.game.Piece;
 import net.rahka.chess.game.Player;
-import net.rahka.chess.utils.SortedHashSet;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * If it can kill an enemy piece, then it does so, otherwise it makes random moves. If it has more than one option
@@ -37,7 +39,7 @@ public class RandomPriorityKillingAgent implements Agent {
 	}
 
 	@Override
-	public Move getMove(Player player, Collection<Move> moves, Chess.State state) {
+	public Move getMove(Player player, Iterator<Move> moves, Chess.State state) {
 		List<ArrayList<Move>> sorted = Arrays.asList(
 				new ArrayList<>(16),
 				new ArrayList<>(16),
@@ -46,7 +48,9 @@ public class RandomPriorityKillingAgent implements Agent {
 				new ArrayList<>(16)
 		);
 
-		for (Move move : moves) {
+		while (moves.hasNext()) {
+			Move move = moves.next();
+
 			Piece piece = state.victim(move.piece, move.move);
 			if (piece != null) {
 				sorted.get(getPieceValue(piece)).add(move);

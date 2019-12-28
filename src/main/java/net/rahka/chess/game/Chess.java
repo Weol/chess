@@ -1,13 +1,10 @@
 package net.rahka.chess.game;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import net.rahka.chess.agent.Agent;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.Iterator;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -37,33 +34,33 @@ public class Chess {
 		Player winner = null;
 		while (winner == null && !Thread.currentThread().isInterrupted()) {
 			{
-				var move = whiteAgent.getMove(Player.WHITE, board.getAllLegalMoves(Player.WHITE), new State(board.getState()));
+				var move = whiteAgent.getMove(Player.WHITE, board.getAllLegalMoves(Player.WHITE), new State(board));
 
-				int fromI = Long.numberOfTrailingZeros(board.getPieces(move.piece) & move.move);
-				int toI = Long.numberOfTrailingZeros((board.getPieces(move.piece) & move.move) ^ move.move);
+				//int fromI = Long.numberOfTrailingZeros(board.getState(move.piece) & move.move);
+				//int toI = Long.numberOfTrailingZeros((board.getState(move.piece) & move.move) ^ move.move);
+				//
+				//System.out.printf("White moved %s from (%d, %d) to (%d, %d)\n", move.piece, fromI % 8, fromI / 8, toI % 8, toI / 8);
 
 				board.move(move.piece, move.move);
 
-				System.out.printf("White moved %s from (%d, %d) to (%d, %d)\n", move.piece, fromI % 8, fromI / 8, toI % 8, toI / 8);
-
 				runBoardChangeHandler();
-				if (board.getPieces(Piece.BLACK_KING) == 0) {
+				if (board.getState(Piece.BLACK_KING) == 0) {
 					winner = Player.WHITE;
 				}
 			}
 
 			if (winner == null) {
-				var move = blackAgent.getMove(Player.BLACK, board.getAllLegalMoves(Player.BLACK), new State(board.getState()));
+				var move = blackAgent.getMove(Player.BLACK, board.getAllLegalMoves(Player.BLACK), new State(board));
 
-				int fromI = Long.numberOfLeadingZeros(board.getPieces(move.piece) & move.move);
-				int toI = Long.numberOfLeadingZeros((board.getPieces(move.piece) & move.move) ^ move.move);
-
-				System.out.printf("Black moved %s from (%d, %d) to (%d, %d)\n", move.piece, fromI % 8, fromI / 8, toI % 8, toI / 8);
+				//int fromI = Long.numberOfLeadingZeros(board.getState(move.piece) & move.move);
+				//int toI = Long.numberOfLeadingZeros((board.getState(move.piece) & move.move) ^ move.move);
+//
+				//System.out.printf("Black moved %s from (%d, %d) to (%d, %d)\n", move.piece, fromI % 8, fromI / 8, toI % 8, toI / 8);
 
 				board.move(move.piece, move.move);
 
 				runBoardChangeHandler();
-				if (board.getPieces(Piece.WHITE_KING) == 0) {
+				if (board.getState(Piece.WHITE_KING) == 0) {
 					winner = Player.BLACK;
 				}
 			}
@@ -74,7 +71,7 @@ public class Chess {
 	private void runBoardChangeHandler() {
 		long[] state = new long[12];
 		for (Piece piece : Piece.values()) {
-			state[piece.index] = board.getPieces(piece);
+			state[piece.index] = board.getState(piece);
 		}
 
 		if (boardChangeHandler != null) handlerExecutor.submit(() -> {
@@ -82,7 +79,7 @@ public class Chess {
 		});
 	}
 
-	public static class State {
+	public static class State extends Board {
 
 		private final int[] remainingPieces;
 
@@ -98,37 +95,16 @@ public class Chess {
 		@Getter(lazy = true)
 		private final long allWhitePieces = calculateAllWhitePieces();
 
-		@Getter(lazy = true)
-		private final Board board = createBoard();
-
-		@Getter
-		private final long[] state;
-
-		public State(long[] state, int[] remainingPieces) {
-			this.state = state;
+		public State(Board board, int[] remainingPieces) {
+			super(board);
 			this.remainingPieces = remainingPieces;
 		}
 
-		public State(long[] state) {
-			this(state, new int[] {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1});
+		public State(Board board) {
+			this(board, new int[] {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1});
 		}
 
 		public State expand(Piece piece, long move) {
-			long[] newState = new long[] {
-					state[0],
-					state[1],
-					state[2],
-					state[3],
-					state[4],
-					state[5],
-					state[6],
-					state[7],
-					state[8],
-					state[9],
-					state[10],
-					state[11],
-			};
-
 			int[] newPieceCounts = new int[] {
 					remainingPieces[0],
 					remainingPieces[1],
@@ -144,25 +120,15 @@ public class Chess {
 					remainingPieces[11],
 			};
 
-			Piece[] adversaries = piece.adversaries();
-
-			long victim = (move & newState[piece.index]) ^ move;
-
-			newState[piece.index] ^= move;
-			for (Piece adversary : adversaries) {
-				if ((newState[adversary.index] & victim) != 0) {
-					newState[adversary.index] = newState[adversary.index] ^ victim;
-					newPieceCounts[adversary.index]--;
-				}
-			}
-
-			return new State(newState, newPieceCounts);
+			State state = new State(this, newPieceCounts);
+			state.move(piece, move);
+			return state;
 		}
 
 		private long calculateAllBlackPieces() {
 			long pieces = 0;
 			for (Piece piece : Piece.getBlack()) {
-				pieces |= state[piece.index];
+				pieces |= getState(piece);
 			}
 			return pieces;
 		}
@@ -170,7 +136,7 @@ public class Chess {
 		private long calculateAllWhitePieces() {
 			long pieces = 0;
 			for (Piece piece : Piece.getWhite()) {
-				pieces |= state[piece.index];
+				pieces |= getState(piece);
 			}
 			return pieces;
 		}
@@ -193,16 +159,16 @@ public class Chess {
 
 		public int remainingPieces(Piece piece) {
 			if (remainingPieces[piece.index] < 0) {
-				remainingPieces[piece.index] = Long.bitCount(state[piece.index]);
+				remainingPieces[piece.index] = Long.bitCount(getState(piece));
 			}
 
 			return remainingPieces[piece.index];
 		}
 
 		public Piece victim(Piece attacker, long move) {
-			long victim = (move & state[attacker.index]) ^ move;
+			long victim = (move & getState(attacker)) ^ move;
 			for (Piece adversary : attacker.adversaries()) {
-				if ((victim & state[adversary.index]) != 0)	{
+				if ((victim & getState(adversary)) != 0)	{
 					return adversary;
 				}
 			}
@@ -211,14 +177,6 @@ public class Chess {
 
 		public boolean isTerminal() {
 			return (remainingPieces(Piece.BLACK_KING) == 0 || remainingPieces(Piece.WHITE_KING) == 0);
-		}
-
-		private Board createBoard() {
-			return new Board(state);
-		}
-
-		public Collection<Move> getAvailableMoves(Player player) {
-			return getBoard().getAllLegalMoves(player);
 		}
 
 	}

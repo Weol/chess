@@ -17,7 +17,7 @@ public class Test {
         for (int i = 0; i < (64 - Long.toBinaryString(x).length()); i++) {
             binary += "0";
         }
-        binary += Long.toBinaryString(x);;
+        binary += Long.toBinaryString(x);
 
         String asd = "";
         for (int i = 0; i < binary.length(); i++) {

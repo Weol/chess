@@ -2,11 +2,10 @@ package net.rahka.chess.agent;
 
 import net.rahka.chess.game.Chess;
 import net.rahka.chess.game.Move;
-import net.rahka.chess.game.Piece;
 import net.rahka.chess.game.Player;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -15,21 +14,25 @@ import java.util.List;
 public class RandomKillingAgent implements Agent {
 
 	@Override
-	public Move getMove(Player player, Collection<Move> moves, Chess.State state) {
+	public Move getMove(Player player, Iterator<Move> moves, Chess.State state) {
 		List<Move> sorted = new ArrayList<>(100);
+		int bestValue = Integer.MIN_VALUE;
 
-		for (Move move : moves) {
-			if (state.remainingPieces(player.not()) > state.expand(move.piece, move.move).remainingPieces(player.not())) {
+		while (moves.hasNext()) {
+			Move move = moves.next();
+
+			int value = state.remainingPieces(player.not()) - state.expand(move.piece, move.move).remainingPieces(player.not());
+			if (value > bestValue) {
+				sorted.clear();
+				sorted.add(move);
+				bestValue = value;
+			} else if (value == bestValue) {
 				sorted.add(move);
 			}
 		}
 
-		if (sorted.isEmpty()) {
-			RandomAgent randomAgent = new RandomAgent();
-			return randomAgent.getMove(player, moves, state);
-		} else {
-			return sorted.get((int) (Math.random() * sorted.size()));
-		}
+		int random = (int) (Math.random() * sorted.size());
+		return sorted.get(random);
 	}
 
 }

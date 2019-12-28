@@ -4,23 +4,28 @@ import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
-import javafx.scene.control.*;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import lombok.*;
+import javafx.scene.paint.Color;
+import lombok.Getter;
+import lombok.Setter;
 import net.rahka.chess.AgentHolder;
 import net.rahka.chess.IO;
 import net.rahka.chess.game.Board;
 import net.rahka.chess.game.Move;
 import net.rahka.chess.game.Piece;
+import net.rahka.chess.game.Player;
 import net.rahka.chess.utils.AdjustableTimer;
 import net.rahka.chess.utils.StateCursorList;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.Iterator;
 
 public abstract class Visualizer extends Pane {
 
@@ -79,7 +84,13 @@ public abstract class Visualizer extends Pane {
 		playBackView.prefWidthProperty().bind(widthProperty());
 		playBackView.setPrefHeight(30);
 
-		boardView = new ChessBoard(8);
+		boardView = new ChessBoard();
+		boardView.setOnMouseClicked((e) -> {
+			int x = (int) e.getX(), y = (int) e.getY();
+			int size = (int) boardView.getWidth() / 8;
+
+			onChessPieceClicked(null, x / size, y / size);
+		});
 		boardView.layoutYProperty().bind(playBackView.heightProperty());
 		boardView.layoutXProperty().bind(widthProperty().divide(2).subtract(boardView.widthProperty().divide(2)));
 		boardView.setWidth(Math.min(getWidth(), getHeight() - playBackView.getHeight()));
@@ -109,23 +120,77 @@ public abstract class Visualizer extends Pane {
 	}
 
 	private void onChessPieceClicked(Piece piece, int x, int y) {
-		if (piece == null) return;
-
-		Board board = new Board(states.cursor().current());
-		long kernel = (-0x8000000000000000L >>> (63 - (y * 8 + x)));
-
-		Collection<Move> moves = board.getAllLegalMoves(piece, kernel);
-
-		long positions = 0;
-		for (Move move : moves) {
-			positions |= move.move;
+		if (boardView.isSquareHighlighted(x, y)) {
+			boardView.unHighlightAll();
+			return;
 		}
 
-		boardView.unmarkAll();
+		long kernel = Board.kernelOf(x, y);
+		Board board = new Board(states.cursor().current());
+
+		if ((kernel & board.getAllPieces()) != 0) {
+			for (ChessPieceView imageView : imageViews) {
+				if (imageView.getBoardX() == x && imageView.getBoardY() == y) {
+					piece = imageView.getPiece();
+				}
+			}
+		}
+
+		long movable = 0;
+		if (piece == null) {
+			Iterator<Move> blackMoves = board.getAllLegalMoves(Player.BLACK);
+			Iterator<Move> whiteMoves = board.getAllLegalMoves(Player.WHITE);
+
+			while (blackMoves.hasNext() || whiteMoves.hasNext()) {
+				Move move = (blackMoves.hasNext()) ? blackMoves.next() : whiteMoves.next();
+
+				if ((kernel & move.move) != 0) {
+					movable |= move.move;
+				}
+			}
+			movable ^= kernel;
+		}
+
+		long attackers = 0;
+		long victims = 0;
+		if (piece != null) {
+			{
+				Iterator<Move> moves = board.getAllLegalMoves(piece.getPlayer().not());
+				while (moves.hasNext()) {
+					Move move = moves.next();
+
+					if ((kernel & move.move) != 0) {
+						attackers |= move.move;
+					}
+				}
+				attackers ^= kernel;
+			}
+
+			{
+				Iterator<Move> moves = board.getAllLegalMoves(piece, x, y);
+				while (moves.hasNext()) {
+					Move move = moves.next();
+
+					if ((kernel & move.move) != 0) {
+						victims |= move.move;
+					}
+				}
+				victims ^= kernel;
+			}
+		}
+
+		boardView.unHighlightAll();
+		boardView.highlightSquare(x, y, Color.GREEN);
 		for (int i = 0; i < 64; i++) {
 			long k = (-0x8000000000000000L >>> (63 - i));
-			if ((positions & k) != 0) {
-				boardView.markSquare(i % 8, i / 8);
+
+			if (i == y * 8 + x) continue;
+			if ((k & victims) != 0 && (k & attackers) != 0) {
+				boardView.highlightSquare(i % 8, i / 8, Color.YELLOW);
+			} else if ((k & victims) != 0) {
+				boardView.highlightSquare(i % 8, i / 8, Color.BLUE);
+			} else if ((k & attackers) != 0 || (k & movable) != 0) {
+				boardView.highlightSquare(i % 8, i / 8, Color.RED);
 			}
 		}
 	}
@@ -223,6 +288,7 @@ public abstract class Visualizer extends Pane {
 	}
 
 	private void changeState(long[] state) {
+		boardView.unHighlightAll();
 		for (ChessPieceView imageView : imageViews) {
 			imageView.setVisible(false);
 		}
@@ -300,6 +366,7 @@ public abstract class Visualizer extends Pane {
 		public void setPiece(Piece piece) {
 			this.piece = piece;
 			setImage(IO.image(getPieceImage(piece)));
+			setSmooth(true);
 		}
 
 	}

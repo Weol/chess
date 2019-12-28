@@ -1,7 +1,6 @@
 package net.rahka.chess.agent.heuristics;
 
 import net.rahka.chess.game.Chess;
-import net.rahka.chess.game.Piece;
 import net.rahka.chess.game.Player;
 
 public class RemainingPiecesHeuristic implements Heuristic {

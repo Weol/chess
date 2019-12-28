@@ -1,8 +1,5 @@
 package net.rahka.paramaters;
 
-import net.rahka.paramaters.Flag;
-import net.rahka.paramaters.ParameterInterpretation;
-
 import java.util.function.Consumer;
 
 /**

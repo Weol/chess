@@ -4,7 +4,8 @@ import net.rahka.chess.game.Chess;
 import net.rahka.chess.game.Move;
 import net.rahka.chess.game.Player;
 
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -13,9 +14,12 @@ import java.util.List;
 public class RandomAgent implements Agent {
 
 	@Override
-	public Move getMove(Player player, Collection<Move> moves, Chess.State state) {
-		int random = (int) (Math.random() * moves.size());
-		return moves.toArray(new Move[moves.size()])[random];
+	public Move getMove(Player player, Iterator<Move> moves, Chess.State state) {
+		List<Move> list = new ArrayList<>(100);
+		moves.forEachRemaining(list::add);
+
+		int random = (int) (Math.random() * list.size());
+		return list.get(random);
 	}
 
 }

@@ -46,7 +46,7 @@ public class Flag<T> {
      */
     protected boolean expectsArgument() {
         return false;
-    };
+    }
 
     /**
      * Parses this flags argument

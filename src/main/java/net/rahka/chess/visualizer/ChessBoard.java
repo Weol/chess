@@ -2,40 +2,38 @@ package net.rahka.chess.visualizer;
 
 import javafx.scene.canvas.Canvas;
 import javafx.scene.paint.Color;
-import lombok.Getter;
-import lombok.NonNull;
 
 public class ChessBoard extends Canvas {
 
 	private static final Color WHITE_SQUARE_COLOR = Color.LIGHTGRAY;
 	private static final Color BLACK_SQUARE_COLOR = Color.DARKGRAY;
 
-	@Getter
-	private final int dimension;
+	private Color[] markedSquares = new Color[64];
 
-	private boolean[] markedSquares = new boolean[64];
-
-	public ChessBoard(int dimension) {
-		this.dimension = dimension;
-
+	public ChessBoard() {
 		widthProperty().addListener((ignored) -> paint());
 		heightProperty().addListener((ignored) -> paint());
 
 		paint();
 	}
 
-	public void markSquare(int x, int y) {
-		markedSquares[y * dimension + x] = true;
+	public boolean isSquareHighlighted(int x, int y) {
+		return (markedSquares[y * 8 + x] != null);
+	}
+
+	public void highlightSquare(int x, int y, Color c) {
+		markedSquares[y * 8 + x] = c;
 		paint();
 	}
 
-	public void unmarkSquare(int x, int y) {
-		markedSquares[y * dimension + x] = false;
+	public void unHighlightSquare(int x, int y) {
+		markedSquares[y * 8 + x] = null;
 		paint();
 	}
 
-	public void unmarkAll() {
-		markedSquares = new boolean[64];
+	public void unHighlightAll() {
+		markedSquares = new Color[64];
+		paint();
 	}
 
 	public void paint() {
@@ -43,17 +41,17 @@ public class ChessBoard extends Canvas {
 
 		var squareSize = Math.min(getWidth() / 8, getHeight() / 8);
 
-		for (int x = 0; x < dimension; x++) {
-			for (int y = 0; y < dimension; y++) {
+		for (int x = 0; x < 8; x++) {
+			for (int y = 0; y < 8; y++) {
 				var squareModulus = x % 2 + y % 2;
 				var squareColor = (squareModulus == 0 || squareModulus == 2) ? WHITE_SQUARE_COLOR : BLACK_SQUARE_COLOR;
 
 				g.setFill(squareColor);
 				g.fillRect(x * squareSize, y * squareSize, squareSize, squareSize);
 
-				if (markedSquares[y * dimension + x]) {
-					g.setFill(Color.RED);
-					g.fillRect(x * squareSize + 5, y * squareSize + 5, squareSize - 10, squareSize - 10);
+				if (markedSquares[y * 8 + x] != null) {
+					g.setStroke(markedSquares[y * 8 + x]);
+					g.strokeRect(x * squareSize + 4, y * squareSize + 4, squareSize - 8, squareSize - 8);
 				}
 			}
 		}

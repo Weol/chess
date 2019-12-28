@@ -11,7 +11,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="chess" target="${maven.compiler.target}" />
+      <module name="chess" target="11" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">

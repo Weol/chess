@@ -14,9 +14,11 @@ public class AdjustableTimer {
 	private ScheduledFuture<?> future;
 
 	private void run() {
-		if (running) {
-			runnable.run();
-			future = scheduler.schedule(this::run, ms, TimeUnit.MILLISECONDS);
+		synchronized (this) {
+			if (running) {
+				runnable.run();
+				future = scheduler.schedule(this::run, ms, TimeUnit.MILLISECONDS);
+			}
 		}
 	}
 
@@ -38,7 +40,9 @@ public class AdjustableTimer {
 	}
 
 	public void adjust(long ms) {
-		this.ms = ms;
+		synchronized (this) {
+			this.ms = ms;
+		}
 	}
 
 }

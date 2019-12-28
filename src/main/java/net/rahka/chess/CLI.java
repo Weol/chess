@@ -19,8 +19,10 @@ public class CLI {
         }
 
         System.out.println("SUMMARY:");
-        System.out.printf("Black won %.2f%% of the games (%.0f)\n", blackWins / games * 100, blackWins);
-        System.out.printf("White won %.2f%% of the games (%.0f)\n", whiteWins / games * 100, whiteWins);
+        System.out.printf("Black (%s) won %.2f%% of the games (%.0f)\n", blackAgent.getClass().getSimpleName(), blackWins / games * 100, blackWins);
+        System.out.printf("White (%s) won %.2f%% of the games (%.0f)\n", whiteAgent.getClass().getSimpleName(), whiteWins / games * 100, whiteWins);
+
+        System.exit(0);
     }
 
 }
