@@ -4,7 +4,7 @@ import net.rahka.chess.game.Piece;
 import net.rahka.chess.game.Player;
 import net.rahka.chess.game.State;
 
-public class RemainingPiecesHeuristic implements Heuristic {
+public class ProtectiveRemainingHeuristic implements Heuristic {
 
     private int getPieceValue(Piece piece) {
         switch (piece) {
@@ -33,7 +33,7 @@ public class RemainingPiecesHeuristic implements Heuristic {
     public int heuristic(Player player, State state) {
         int alliedSum = 0, enemySum = 0;
         for (Piece piece : Piece.of(player)) {
-            alliedSum += getPieceValue(piece) * state.remainingPieces(piece);
+            alliedSum += (getPieceValue(piece) + 2) * state.remainingPieces(piece);
         }
 
         for (Piece piece : Piece.of(player.not())) {

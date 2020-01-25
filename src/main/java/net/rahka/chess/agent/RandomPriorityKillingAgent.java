@@ -1,9 +1,12 @@
 package net.rahka.chess.agent;
 
-import net.rahka.chess.game.Chess;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import net.rahka.chess.game.Move;
 import net.rahka.chess.game.Piece;
 import net.rahka.chess.game.Player;
+import net.rahka.chess.game.State;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,7 +17,12 @@ import java.util.List;
  * If it can kill an enemy piece, then it does so, otherwise it makes random moves. If it has more than one option
  * of pieces to kill it will kill the one with the highest value
  */
+@RequiredArgsConstructor
 public class RandomPriorityKillingAgent implements Agent {
+
+	@NonNull
+	@Getter
+	private AgentConfiguration configuration;
 
 	private int getPieceValue(Piece piece) {
 		switch (piece) {
@@ -39,7 +47,7 @@ public class RandomPriorityKillingAgent implements Agent {
 	}
 
 	@Override
-	public Move getMove(Player player, Iterator<Move> moves, Chess.State state) {
+	public Move getMove(Player player, Iterator<Move> moves, State state) {
 		List<ArrayList<Move>> sorted = Arrays.asList(
 				new ArrayList<>(16),
 				new ArrayList<>(16),

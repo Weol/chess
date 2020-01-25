@@ -31,7 +31,8 @@ public class IO {
 		STOP("stop.png", "#22bb63"),
 		EXECUTE("play.png", "#22bb63"),
 		RESET("loop.png", "#22bb63"),
-		CARET_DOWN("caret_down.png", "#22bb63");
+		CARET_DOWN("caret_down.png", "#22bb63"),
+		TRASH("trash.png", "#22bb63");
 
 		private final String fileName;
 		private String color;

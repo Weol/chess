@@ -1,6 +1,6 @@
 package net.rahka.chess.game;
 
-public interface BoardStateChangeHandler {
+public interface StateChangeHandler {
 
     void onBoardStateChange(long[] state);
 

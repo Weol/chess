@@ -1,6 +1,10 @@
 package net.rahka.chess.utils;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.SortedSet;
 
 /**
  * An implementation of SortedSet using a hashset and backing linked list for keeping order. Add and remove operations

@@ -2,31 +2,52 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="e1e462b9-b36d-4329-a34f-4b7ba7b1811c" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/utils/NullFilteredIterator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/AgentSupplier.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/agent/AgentConfiguration.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/agent/heuristics/ProtectiveRemainingHeuristic.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/agent/heuristics/SimpleRemainingPiecesHeuristic.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/game/State.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/visualizer/EditContextMenu.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/chess.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/chess.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_openjfx_javafx_base_linux_13.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_openjfx_javafx_controls_linux_13.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_openjfx_javafx_graphics_linux_13.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/chess/AgentHolder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/HeuristicSupplier.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/chess/Application.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/Application.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/chess/CLI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/CLI.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/chess/Test.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/Test.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/chess/IO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/IO.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/chess/agent/Agent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/agent/Agent.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/chess/agent/GreedyHeuristicAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/agent/GreedyHeuristicAgent.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/chess/agent/MiniMaxAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/agent/MiniMaxAgent.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/chess/agent/RandomAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/agent/RandomAgent.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/chess/agent/RandomKillingAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/agent/RandomKillingAgent.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/chess/agent/RandomPriorityKillingAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/agent/RandomPriorityKillingAgent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/chess/agent/heuristics/Heuristic.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/agent/heuristics/Heuristic.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/chess/agent/heuristics/PriorityRemainingPiecesHeuristic.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/agent/heuristics/HomocidalRemainingHeuristic.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/chess/agent/heuristics/RemainingPiecesHeuristic.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/agent/heuristics/RemainingPiecesHeuristic.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/chess/game/Board.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/game/Board.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/chess/game/BoardStateChangeHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/game/StateChangeHandler.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/chess/game/Chess.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/game/Chess.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/chess/game/Move.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/game/Move.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/chess/game/Piece.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/game/Piece.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/chess/utils/AdjustableTimer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/utils/AdjustableTimer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/chess/utils/SortedHashSet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/utils/SortedHashSet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/chess/utils/StateCursorList.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/utils/StateCursorList.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/chess/visualizer/ChessBoard.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/visualizer/ChessBoard.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/chess/visualizer/ImageButton.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/visualizer/ImageButton.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/chess/visualizer/Visualizer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/visualizer/Visualizer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/paramaters/ConusmerFlag.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/paramaters/ConusmerFlag.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/paramaters/Flag.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/paramaters/Flag.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/paramaters/ParameterInterpretation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/paramaters/ParameterInterpretation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/paramaters/CollectionFlag.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/paramaters/ConusmerFlag.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/paramaters/Flag.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/paramaters/FunctionFlag.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/paramaters/ParamaterException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/paramaters/ParameterInterpretation.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/paramaters/ParameterInterpreter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/paramaters/RunnableFlag.java" beforeDir="false" />
     </list>
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -75,6 +96,9 @@
     <option name="jreName" value="#JAVA_INTERNAL" />
   </component>
   <component name="ProjectId" id="1TeYpXqUl5M3prWyx2GUglnIwoo" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showExcludedFiles" value="true" />
@@ -82,36 +106,61 @@
   </component>
   <component name="PropertiesComponent">
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
+    <property name="LombokPluginEnabledInProject" value="true" />
+    <property name="LombokPluginIS_ANNOTATION_PROCESSING_CHECK_Enabled" value="true" />
+    <property name="LombokPluginIS_BUILDER_Enabled" value="true" />
+    <property name="LombokPluginIS_CONSTRUCTOR_Enabled" value="true" />
+    <property name="LombokPluginIS_DELEGATE_Enabled" value="true" />
+    <property name="LombokPluginIS_LOG_Enabled" value="true" />
+    <property name="LombokPluginIS_LOMBOK_VERSION_CHECK_Enabled" value="false" />
+    <property name="LombokPluginIS_MISSING_LOMBOK_CHECK_Enabled" value="true" />
+    <property name="LombokPluginIS_VAL_Enabled" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/main/java/net/rahka/chess/agent" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="nodejs_package_manager_path" value="npm" />
     <property name="project.structure.last.edited" value="SDKs" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="restartRequiresConfirmation" value="false" />
     <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
-    <property name="settings.editor.selected.configurable" value="reference.projectsettings.compiler.javacompiler" />
+    <property name="settings.editor.selected.configurable" value="editing.templates" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Erik\Workspace\Projects\chess\src\main\resources" />
       <recent name="$PROJECT_DIR$/src/main/java/net/rahka/chess/agent" />
       <recent name="$PROJECT_DIR$/src/main/resources" />
-      <recent name="C:\Users\Erik\Workspace\Projects\chess\src\main\resources" />
       <recent name="C:\Users\Erik\Workspace\Projects\chess\src\main\java" />
       <recent name="C:\Users\Erik\Workspace\Projects\chess\src\main\java\net\rahka" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
-      <recent name="net.rahka.chess.utils" />
+      <recent name="net.rahka.parameters" />
+      <recent name="net.rahka.paramaters" />
+      <recent name="net.rahka.chess" />
       <recent name="net.rahka.chess.agent.heuristics" />
-      <recent name="net.rahka.chess.agent" />
+      <recent name="net.rahka.chess.utils" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/src/main/java/net/rahka/chess/agent" />
       <recent name="$PROJECT_DIR$/src/main/java/net/rahka/chess" />
     </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
   </component>
   <component name="RunManager" selected="Application.Application">
     <configuration name="Application" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
@@ -132,7 +181,7 @@
     <configuration name="Benchmark" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="net.rahka.chess.Application" />
       <module name="chess" />
-      <option name="PROGRAM_PARAMETERS" value="-b RandomKilling -w MiniMax -n 100" />
+      <option name="PROGRAM_PARAMETERS" value="-b RandomAgent -w RandomAgent -n 100" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -162,17 +211,11 @@
       </list>
     </recent_temporary>
   </component>
-  <component name="ServiceViewManager">
-    <option name="viewStates">
-      <list>
-        <serviceView>
-          <treeState>
-            <expand />
-            <select />
-          </treeState>
-        </serviceView>
-      </list>
-    </option>
+  <component name="SpringGeneralSettings">
+    <option name="allowAutoConfigurationMode" value="true" />
+  </component>
+  <component name="StructureViewFactory">
+    <option name="ACTIVE_ACTIONS" value=",SHOW_ANONYMOUS,SHOW_INTERFACES,SHOW_PROPERTIES,SHOW_FIELDS,VISIBILITY_SORTER" />
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -205,7 +248,35 @@
       <workItem from="1577115857298" duration="9580000" />
       <workItem from="1577287874600" duration="8817000" />
       <workItem from="1577305642339" duration="6848000" />
-      <workItem from="1577367876661" duration="31118000" />
+      <workItem from="1577367876661" duration="31435000" />
+      <workItem from="1577537644099" duration="21250000" />
+      <workItem from="1577640129110" duration="4164000" />
+      <workItem from="1577659254378" duration="326000" />
+      <workItem from="1577659630476" duration="64000" />
+      <workItem from="1577659737202" duration="1831000" />
+      <workItem from="1577661638001" duration="1429000" />
+      <workItem from="1577663126960" duration="4122000" />
+      <workItem from="1577709481802" duration="12755000" />
+      <workItem from="1577801567305" duration="3637000" />
+      <workItem from="1577913050965" duration="379000" />
+      <workItem from="1578039317579" duration="5514000" />
+      <workItem from="1578045249107" duration="133000" />
+      <workItem from="1578045548574" duration="11992000" />
+      <workItem from="1578058107919" duration="7058000" />
+      <workItem from="1578140074652" duration="25060000" />
+      <workItem from="1578237141666" duration="605000" />
+      <workItem from="1578240724234" duration="2116000" />
+      <workItem from="1578257958820" duration="1851000" />
+      <workItem from="1578267189055" duration="599000" />
+      <workItem from="1578268610751" duration="362000" />
+      <workItem from="1578330598263" duration="138000" />
+      <workItem from="1578330784804" duration="155000" />
+      <workItem from="1578330978392" duration="652000" />
+      <workItem from="1578393094606" duration="5777000" />
+      <workItem from="1579258220612" duration="1400000" />
+      <workItem from="1579796779319" duration="16797000" />
+      <workItem from="1579962240244" duration="7521000" />
+      <workItem from="1579969799974" duration="3461000" />
     </task>
     <servers />
   </component>
@@ -225,27 +296,42 @@
       </map>
     </option>
   </component>
+  <component name="VcsManagerConfiguration">
+    <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
+  </component>
   <component name="WindowStateProjectService">
-    <state x="746" y="313" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1577494280895">
+    <state x="674" y="357" width="551" height="285" key="#com.intellij.codeInsight.template.impl.EditVariableDialog" timestamp="1577661012816">
       <screen x="0" y="0" width="1920" height="1032" />
     </state>
-    <state x="746" y="313" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1032@0.0.1920.1032" timestamp="1577494280895" />
-    <state x="1248" y="214" width="374" height="573" key="#com.intellij.ide.util.MemberChooser" timestamp="1577475322562">
+    <state x="674" y="357" width="551" height="285" key="#com.intellij.codeInsight.template.impl.EditVariableDialog/0.0.1920.1032@0.0.1920.1032" timestamp="1577661012816" />
+    <state x="475" y="59" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1578172413939">
       <screen x="0" y="0" width="1920" height="1032" />
     </state>
-    <state x="1248" y="214" width="374" height="573" key="#com.intellij.ide.util.MemberChooser/0.0.1920.1032@0.0.1920.1032" timestamp="1577475322562" />
+    <state x="475" y="59" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1032@0.0.1920.1032" timestamp="1578172413939" />
+    <state x="696" y="339" width="518" height="321" key="#com.intellij.ide.actions.ChooseComponentsToExportDialog" timestamp="1577662257789">
+      <screen x="0" y="0" width="1920" height="1032" />
+    </state>
+    <state x="696" y="339" width="518" height="321" key="#com.intellij.ide.actions.ChooseComponentsToExportDialog/0.0.1920.1032@0.0.1920.1032" timestamp="1577662257789" />
+    <state x="1248" y="214" width="374" height="573" key="#com.intellij.ide.util.MemberChooser" timestamp="1578168701012">
+      <screen x="0" y="0" width="1920" height="1032" />
+    </state>
+    <state x="1248" y="214" width="374" height="573" key="#com.intellij.ide.util.MemberChooser/0.0.1920.1032@0.0.1920.1032" timestamp="1578168701012" />
     <state x="692" y="288" width="525" height="426" key="#com.intellij.ide.util.TreeClassChooserDialog" timestamp="1577493959638">
       <screen x="0" y="0" width="1920" height="1032" />
     </state>
     <state x="692" y="288" width="525" height="426" key="#com.intellij.ide.util.TreeClassChooserDialog/0.0.1920.1032@0.0.1920.1032" timestamp="1577493959638" />
+    <state x="667" y="173" width="576" height="655" key="#com.intellij.refactoring.encapsulateFields.EncalpsulateFieldsDialog" timestamp="1579258791164">
+      <screen x="0" y="0" width="1920" height="1032" />
+    </state>
+    <state x="667" y="173" width="576" height="655" key="#com.intellij.refactoring.encapsulateFields.EncalpsulateFieldsDialog/0.0.1920.1032@0.0.1920.1032" timestamp="1579258791164" />
     <state x="713" y="389" width="484" height="235" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes" timestamp="1577122841567">
       <screen x="0" y="0" width="1920" height="1032" />
     </state>
     <state x="713" y="389" width="484" height="235" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes/0.0.1920.1032@0.0.1920.1032" timestamp="1577122841567" />
-    <state x="528" y="0" width="853" height="1030" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1577467392103">
+    <state x="528" y="0" width="853" height="1030" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1578169762220">
       <screen x="0" y="0" width="1920" height="1032" />
     </state>
-    <state x="528" y="0" width="853" height="1030" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1920.1032@0.0.1920.1032" timestamp="1577467392103" />
+    <state x="528" y="0" width="853" height="1030" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1920.1032@0.0.1920.1032" timestamp="1578169762220" />
     <state x="693" y="251" width="524" height="500" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1577120232012">
       <screen x="0" y="0" width="1920" height="1032" />
     </state>
@@ -266,54 +352,58 @@
       <screen x="0" y="0" width="1920" height="1032" />
     </state>
     <state x="696" y="358" width="518" height="286" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/0.0.1920.1032@0.0.1920.1032" timestamp="1577486795836" />
-    <state x="100" y="72" width="1720" height="860" key="DiffContextDialog" timestamp="1577023692637">
+    <state x="100" y="72" width="1720" height="860" key="DiffContextDialog" timestamp="1578160426808">
       <screen x="0" y="0" width="1920" height="1032" />
     </state>
-    <state x="100" y="72" width="1720" height="860" key="DiffContextDialog/0.0.1920.1032@0.0.1920.1032" timestamp="1577023692637" />
+    <state x="100" y="72" width="1720" height="860" key="DiffContextDialog/0.0.1920.1032@0.0.1920.1032" timestamp="1578160426808" />
+    <state x="704" y="245" width="501" height="511" key="FileChooserDialogImpl" timestamp="1577659358450">
+      <screen x="0" y="0" width="1920" height="1032" />
+    </state>
+    <state x="704" y="245" width="501" height="511" key="FileChooserDialogImpl/0.0.1920.1032@0.0.1920.1032" timestamp="1577659358450" />
     <state x="0" y="0" width="1910" height="1030" key="FileDocumentManager.FileCacheConflict" timestamp="1577487267285">
       <screen x="0" y="0" width="1920" height="1032" />
     </state>
     <state x="0" y="0" width="1910" height="1030" key="FileDocumentManager.FileCacheConflict/0.0.1920.1032@0.0.1920.1032" timestamp="1577487267285" />
-    <state width="1874" height="280" key="GridCell.Tab.0.bottom" timestamp="1577494350134">
+    <state width="1874" height="289" key="GridCell.Tab.0.bottom" timestamp="1578268972426">
       <screen x="0" y="0" width="1920" height="1032" />
     </state>
-    <state width="1874" height="280" key="GridCell.Tab.0.bottom/0.0.1920.1032@0.0.1920.1032" timestamp="1577494350134" />
-    <state width="1874" height="280" key="GridCell.Tab.0.center" timestamp="1577494350131">
+    <state width="1874" height="289" key="GridCell.Tab.0.bottom/0.0.1920.1032@0.0.1920.1032" timestamp="1578268972426" />
+    <state width="1874" height="289" key="GridCell.Tab.0.center" timestamp="1578268972425">
       <screen x="0" y="0" width="1920" height="1032" />
     </state>
-    <state width="1874" height="280" key="GridCell.Tab.0.center/0.0.1920.1032@0.0.1920.1032" timestamp="1577494350131" />
-    <state width="1874" height="280" key="GridCell.Tab.0.left" timestamp="1577494350131">
+    <state width="1874" height="289" key="GridCell.Tab.0.center/0.0.1920.1032@0.0.1920.1032" timestamp="1578268972425" />
+    <state width="1874" height="289" key="GridCell.Tab.0.left" timestamp="1578268972424">
       <screen x="0" y="0" width="1920" height="1032" />
     </state>
-    <state width="1874" height="280" key="GridCell.Tab.0.left/0.0.1920.1032@0.0.1920.1032" timestamp="1577494350131" />
-    <state width="1874" height="280" key="GridCell.Tab.0.right" timestamp="1577494350134">
+    <state width="1874" height="289" key="GridCell.Tab.0.left/0.0.1920.1032@0.0.1920.1032" timestamp="1578268972424" />
+    <state width="1874" height="289" key="GridCell.Tab.0.right" timestamp="1578268972426">
       <screen x="0" y="0" width="1920" height="1032" />
     </state>
-    <state width="1874" height="280" key="GridCell.Tab.0.right/0.0.1920.1032@0.0.1920.1032" timestamp="1577494350134" />
-    <state width="1874" height="256" key="GridCell.Tab.1.bottom" timestamp="1577493930091">
+    <state width="1874" height="289" key="GridCell.Tab.0.right/0.0.1920.1032@0.0.1920.1032" timestamp="1578268972426" />
+    <state width="1874" height="236" key="GridCell.Tab.1.bottom" timestamp="1578172633303">
       <screen x="0" y="0" width="1920" height="1032" />
     </state>
-    <state width="1874" height="256" key="GridCell.Tab.1.bottom/0.0.1920.1032@0.0.1920.1032" timestamp="1577493930091" />
-    <state width="1874" height="256" key="GridCell.Tab.1.center" timestamp="1577493930091">
+    <state width="1874" height="236" key="GridCell.Tab.1.bottom/0.0.1920.1032@0.0.1920.1032" timestamp="1578172633303" />
+    <state width="1874" height="236" key="GridCell.Tab.1.center" timestamp="1578172633302">
       <screen x="0" y="0" width="1920" height="1032" />
     </state>
-    <state width="1874" height="256" key="GridCell.Tab.1.center/0.0.1920.1032@0.0.1920.1032" timestamp="1577493930091" />
-    <state width="1874" height="256" key="GridCell.Tab.1.left" timestamp="1577493930090">
+    <state width="1874" height="236" key="GridCell.Tab.1.center/0.0.1920.1032@0.0.1920.1032" timestamp="1578172633302" />
+    <state width="1874" height="236" key="GridCell.Tab.1.left" timestamp="1578172633301">
       <screen x="0" y="0" width="1920" height="1032" />
     </state>
-    <state width="1874" height="256" key="GridCell.Tab.1.left/0.0.1920.1032@0.0.1920.1032" timestamp="1577493930090" />
-    <state width="1874" height="256" key="GridCell.Tab.1.right" timestamp="1577493930091">
+    <state width="1874" height="236" key="GridCell.Tab.1.left/0.0.1920.1032@0.0.1920.1032" timestamp="1578172633301" />
+    <state width="1874" height="236" key="GridCell.Tab.1.right" timestamp="1578172633302">
       <screen x="0" y="0" width="1920" height="1032" />
     </state>
-    <state width="1874" height="256" key="GridCell.Tab.1.right/0.0.1920.1032@0.0.1920.1032" timestamp="1577493930091" />
-    <state x="495" y="165" width="924" height="682" key="Maven.ArtifactSearchDialog" timestamp="1577463982270">
+    <state width="1874" height="236" key="GridCell.Tab.1.right/0.0.1920.1032@0.0.1920.1032" timestamp="1578172633302" />
+    <state x="495" y="165" width="924" height="682" key="Maven.ArtifactSearchDialog" timestamp="1578268710009">
       <screen x="0" y="0" width="1920" height="1032" />
     </state>
-    <state x="495" y="165" width="924" height="682" key="Maven.ArtifactSearchDialog/0.0.1920.1032@0.0.1920.1032" timestamp="1577463982270" />
-    <state x="443" y="79" width="1024" height="843" key="SettingsEditor" timestamp="1577050142953">
+    <state x="495" y="165" width="924" height="682" key="Maven.ArtifactSearchDialog/0.0.1920.1032@0.0.1920.1032" timestamp="1578268710009" />
+    <state x="415" y="54" width="1441" height="843" key="SettingsEditor" timestamp="1578330914646">
       <screen x="0" y="0" width="1920" height="1032" />
     </state>
-    <state x="443" y="79" width="1024" height="843" key="SettingsEditor/0.0.1920.1032@0.0.1920.1032" timestamp="1577050142953" />
+    <state x="415" y="54" width="1441" height="843" key="SettingsEditor/0.0.1920.1032@0.0.1920.1032" timestamp="1578330914646" />
     <state width="960" height="530" key="XDebugger.FullValuePopup" timestamp="1577031643475">
       <screen x="0" y="0" width="1920" height="1032" />
     </state>
@@ -322,51 +412,48 @@
       <screen x="0" y="0" width="1920" height="1032" />
     </state>
     <state x="613" y="120" width="683" height="762" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/0.0.1920.1032@0.0.1920.1032" timestamp="1577061492413" />
-    <state x="728" y="422" width="464" height="160" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1577126608540">
+    <state x="728" y="422" width="454" height="158" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1577640530055">
       <screen x="0" y="0" width="1920" height="1032" />
     </state>
-    <state x="728" y="422" width="464" height="160" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1920.1032@0.0.1920.1032" timestamp="1577126608540" />
+    <state x="728" y="422" width="454" height="158" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1920.1032@0.0.1920.1032" timestamp="1577640530055" />
+    <state x="458" y="241" width="993" height="520" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2" timestamp="1577550491677">
+      <screen x="0" y="0" width="1920" height="1032" />
+    </state>
+    <state x="458" y="241" width="993" height="520" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2/0.0.1920.1032@0.0.1920.1032" timestamp="1577550491677" />
     <state x="554" y="287" width="524" height="438" key="extract.method.dialog" timestamp="1577462053874">
       <screen x="0" y="0" width="1920" height="1032" />
     </state>
     <state x="554" y="287" width="524" height="438" key="extract.method.dialog/0.0.1920.1032@0.0.1920.1032" timestamp="1577462053874" />
-    <state x="947" y="177" width="869" height="596" key="find.popup" timestamp="1577306111043">
+    <state x="946" y="178" width="869" height="606" key="find.popup" timestamp="1578258310711">
       <screen x="0" y="0" width="1920" height="1032" />
     </state>
-    <state x="947" y="177" width="869" height="596" key="find.popup/0.0.1920.1032@0.0.1920.1032" timestamp="1577306111043" />
-    <state x="705" y="130" width="500" height="741" key="refactoring.ChangeSignatureDialog" timestamp="1577489654615">
+    <state x="946" y="178" width="869" height="606" key="find.popup/0.0.1920.1032@0.0.1920.1032" timestamp="1578258310711" />
+    <state x="269" y="104" width="1372" height="794" key="new project wizard" timestamp="1578172620897">
       <screen x="0" y="0" width="1920" height="1032" />
     </state>
-    <state x="705" y="130" width="500" height="741" key="refactoring.ChangeSignatureDialog/0.0.1920.1032@0.0.1920.1032" timestamp="1577489654615" />
-    <state x="624" y="228" key="run.anything.popup" timestamp="1577304889453">
+    <state x="269" y="104" width="1372" height="794" key="new project wizard/0.0.1920.1032@0.0.1920.1032" timestamp="1578172620897" />
+    <state x="705" y="130" width="500" height="741" key="refactoring.ChangeSignatureDialog" timestamp="1578040407636">
       <screen x="0" y="0" width="1920" height="1032" />
     </state>
-    <state x="624" y="228" key="run.anything.popup/0.0.1920.1032@0.0.1920.1032" timestamp="1577304889453" />
-    <state x="623" y="206" width="672" height="678" key="search.everywhere.popup" timestamp="1577493256341">
+    <state x="705" y="130" width="500" height="741" key="refactoring.ChangeSignatureDialog/0.0.1920.1032@0.0.1920.1032" timestamp="1578040407636" />
+    <state x="624" y="228" width="672" height="677" key="run.anything.popup" timestamp="1577802453913">
       <screen x="0" y="0" width="1920" height="1032" />
     </state>
-    <state x="623" y="206" width="672" height="678" key="search.everywhere.popup/0.0.1920.1032@0.0.1920.1032" timestamp="1577493256341" />
+    <state x="624" y="228" width="672" height="677" key="run.anything.popup/0.0.1920.1032@0.0.1920.1032" timestamp="1577802453912" />
+    <state x="623" y="206" width="672" height="678" key="search.everywhere.popup" timestamp="1578162884388">
+      <screen x="0" y="0" width="1920" height="1032" />
+    </state>
+    <state x="623" y="206" width="672" height="678" key="search.everywhere.popup/0.0.1920.1032@0.0.1920.1032" timestamp="1578162884388" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/net/rahka/chess/game/Chess.java</url>
-          <line>178</line>
-          <option name="timeStamp" value="155" />
+          <url>file://$PROJECT_DIR$/src/main/java/net/rahka/parameters/ExceptionCaughtException.java</url>
+          <line>6</line>
+          <option name="timeStamp" value="1" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
-    <watches-manager>
-      <configuration name="Application">
-        <watch expression="Test.PrintBinaryLong(k)" language="JAVA" custom="net.rahka.chess.Test" />
-        <watch expression="Test.PrintBinaryLong(victims)" language="JAVA" custom="net.rahka.chess.Test" />
-        <watch expression="Test.PrintBinaryLong(attackers)" language="JAVA" custom="net.rahka.chess.Test" />
-        <watch expression="Test.PrintBinaryLong(k &amp; victims)" language="JAVA" custom="net.rahka.chess.Test" />
-        <watch expression="Test.PrintBinaryLong(kernel)" language="JAVA" custom="net.rahka.chess.Test" />
-        <watch expression="Test.PrintBinaryLong(k &amp; attackers)" language="JAVA" custom="net.rahka.chess.Test" />
-        <watch expression="Test.PrintBinaryLong(attackers &amp; victims)" language="JAVA" custom="net.rahka.chess.Test" />
-      </configuration>
-    </watches-manager>
   </component>
 </project>

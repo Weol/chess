@@ -29,6 +29,21 @@
             <artifactId>javafx-graphics</artifactId>
             <version>13</version>
         </dependency>
+        <dependency>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections</artifactId>
+            <version>0.9.11</version>
+        </dependency>
+        <dependency>
+            <groupId>net.rahka</groupId>
+            <artifactId>parameters</artifactId>
+            <version>1578268482</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.30</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -60,5 +75,12 @@
         </plugins>
     </build>
 
+    <repositories>
+        <repository>
+            <id>github</id>
+            <name>GitHub Weol Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/weol/parameters</url>
+        </repository>
+    </repositories>
 
 </project>

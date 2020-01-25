@@ -94,7 +94,7 @@ public class StateCursorList {
 
 	}
 
-	private class Node {
+	private static class Node {
 
 		private long[] payload;
 		private Node next;

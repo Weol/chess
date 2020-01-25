@@ -1,10 +1,10 @@
 package net.rahka.chess.agent.heuristics;
 
-import net.rahka.chess.game.Chess;
 import net.rahka.chess.game.Piece;
 import net.rahka.chess.game.Player;
+import net.rahka.chess.game.State;
 
-public class PriorityRemainingPiecesHeuristic implements Heuristic {
+public class HomocidalRemainingHeuristic implements Heuristic {
 
     private int getPieceValue(Piece piece) {
         switch (piece) {
@@ -30,14 +30,14 @@ public class PriorityRemainingPiecesHeuristic implements Heuristic {
     }
 
     @Override
-    public int heuristic(Player player, Chess.State state) {
+    public int heuristic(Player player, State state) {
         int alliedSum = 0, enemySum = 0;
         for (Piece piece : Piece.of(player)) {
             alliedSum += getPieceValue(piece) * state.remainingPieces(piece);
         }
 
         for (Piece piece : Piece.of(player.not())) {
-            enemySum += getPieceValue(piece) * state.remainingPieces(piece);
+            enemySum += (getPieceValue(piece) + 2) * state.remainingPieces(piece);
         }
 
         return alliedSum - enemySum;

@@ -1,8 +1,11 @@
 package net.rahka.chess.agent;
 
-import net.rahka.chess.game.Chess;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import net.rahka.chess.game.Move;
 import net.rahka.chess.game.Player;
+import net.rahka.chess.game.State;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -11,17 +14,22 @@ import java.util.List;
 /**
  * If it can kill an enemy piece, then it does so, otherwise it makes random moves
  */
+@RequiredArgsConstructor
 public class RandomKillingAgent implements Agent {
 
+	@NonNull
+	@Getter
+	private AgentConfiguration configuration;
+
 	@Override
-	public Move getMove(Player player, Iterator<Move> moves, Chess.State state) {
+	public Move getMove(Player player, Iterator<Move> moves, State state) {
 		List<Move> sorted = new ArrayList<>(100);
 		int bestValue = Integer.MIN_VALUE;
 
 		while (moves.hasNext()) {
 			Move move = moves.next();
 
-			int value = state.remainingPieces(player.not()) - state.expand(move.piece, move.move).remainingPieces(player.not());
+			int value = state.remainingPieces(player.not()) - state.expand(move).remainingPieces(player.not());
 			if (value > bestValue) {
 				sorted.clear();
 				sorted.add(move);
