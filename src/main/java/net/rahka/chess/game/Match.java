@@ -29,10 +29,16 @@ public class Match {
 	Agent whiteAgent, blackAgent;
 
 	@Getter
+	Player currentPlayer;
+
+	@Getter
 	Player winner;
 
 	@Setter
 	Consumer<State> onStateChangeHandler;
+
+	@Setter
+	Consumer<Player> onCurrentPlayerChangeHandler;
 
 	@Setter
 	Consumer<long[]> onBoardStateChangeHandler;
@@ -41,6 +47,11 @@ public class Match {
 	State state;
 
 	Thread thread;
+
+	public void setCurrentPlayer(Player player) {
+		currentPlayer = player;
+		if (onCurrentPlayerChangeHandler != null) onCurrentPlayerChangeHandler.accept(player);
+	}
 
 	void setMatchState(State matchState) {
 		state = matchState;
@@ -53,6 +64,14 @@ public class Match {
 
 	public void interrupt() {
 		thread.interrupt();
+		try {
+			thread.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void join() {
 		try {
 			thread.join();
 		} catch (InterruptedException e) {

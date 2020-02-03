@@ -37,6 +37,12 @@
     -fx-border-color: lightgray
 }
 
+.message-pane {
+    -fx-border-width: 1px 0 0 0;
+    -fx-border-color: lightgray;
+    -fx-padding: 0px 10px 0px 10px;
+}
+
 .dropdown-popup-button {
     -fx-border-width: 1;
     -fx-border-color: lightgray;
@@ -73,5 +79,28 @@
     -fx-faint-focus-color: transparent;
 }
 
+.piece-picker {
+    -fx-background-color: -fx-body-color;
+    -fx-padding: 10px;
+    -fx-border-width: 1;
+    -fx-border-color: darkgrey;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+}
+
+.piece-picker .image-view {
+    -fx-scale-x: 0.9;
+    -fx-scale-y: 0.9;
+    -fx-cursor: pointer;
+}
+
+.piece-picker .image-view:hover {
+    -fx-scale-x: 1.0;
+    -fx-scale-y: 1.0;
+}
+
+.shadow-pane {
+    -fx-background-color: rgba(0,0,0,0.3);
+}
 
 

@@ -16,6 +16,7 @@ public class Chess {
 			if (winner == null) {
 				match.setMatchState(Match.State.INTERRUPTED);
 			} else {
+				match.winner = winner;
 				match.setMatchState(Match.State.FINISHED);
 			}
 		});
@@ -30,12 +31,13 @@ public class Chess {
 		Player winner = null;
 		while (winner == null && !Thread.currentThread().isInterrupted()) {
 			{
+				match.setCurrentPlayer(Player.WHITE);
 				var move = whiteAgent.getMove(Player.WHITE, board.getAllLegalMoves(Player.WHITE), new State(board));
 
-				int fromI = Long.numberOfTrailingZeros(board.getState(move.piece) & move.move);
-				int toI = Long.numberOfTrailingZeros((board.getState(move.piece) & move.move) ^ move.move);
+				//int fromI = Long.numberOfTrailingZeros(board.getState(move.piece) & move.move);
+				//int toI = Long.numberOfTrailingZeros((board.getState(move.piece) & move.move) ^ move.move);
 
-				System.out.printf("White moved %s from (%d, %d) to (%d, %d)\n", move.piece, fromI % 8, fromI / 8, toI % 8, toI / 8);
+				//System.out.printf("White moved %s from (%d, %d) to (%d, %d)\n", move.piece, fromI % 8, fromI / 8, toI % 8, toI / 8);
 
 				board.move(move);
 				match.moves.add(Arrays.copyOf(board.getState(), 12));
@@ -49,12 +51,13 @@ public class Chess {
 			}
 
 			if (winner == null && !Thread.currentThread().isInterrupted()) {
+				match.setCurrentPlayer(Player.BLACK);
 				var move = blackAgent.getMove(Player.BLACK, board.getAllLegalMoves(Player.BLACK), new State(board));
 
-				int fromI = Long.numberOfLeadingZeros(board.getState(move.piece) & move.move);
-				int toI = Long.numberOfLeadingZeros((board.getState(move.piece) & move.move) ^ move.move);
+				//int fromI = Long.numberOfLeadingZeros(board.getState(move.piece) & move.move);
+				//int toI = Long.numberOfLeadingZeros((board.getState(move.piece) & move.move) ^ move.move);
 
-				System.out.printf("Black moved %s from (%d, %d) to (%d, %d)\n", move.piece, fromI % 8, fromI / 8, toI % 8, toI / 8);
+				//System.out.printf("Black moved %s from (%d, %d) to (%d, %d)\n", move.piece, fromI % 8, fromI / 8, toI % 8, toI / 8);
 
 				board.move(move);
 

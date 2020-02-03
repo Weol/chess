@@ -2,16 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="e1e462b9-b36d-4329-a34f-4b7ba7b1811c" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_openjfx_javafx_base_win_13.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_openjfx_javafx_controls_win_13.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_openjfx_javafx_graphics_win_13.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/chess/Application.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/Application.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/chess/CLI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/CLI.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/chess/game/Board.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/game/Board.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/chess/game/Chess.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/game/Chess.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/chess/game/Match.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/game/Match.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/chess/visualizer/ChessBoard.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/visualizer/ChessBoard.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/net/rahka/chess/visualizer/Visualizer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/rahka/chess/visualizer/Visualizer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/application.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.css" afterDir="false" />
     </list>
@@ -149,7 +141,7 @@
     <configuration name="Benchmark" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="net.rahka.chess.Application" />
       <module name="chess" />
-      <option name="PROGRAM_PARAMETERS" value="-b MiniMaxAgent -w MiniMaxAgent -bh HomocidalRemainingHeuristic -wh ProtectiveRemainingHeuristic -n 100 -dl 3" />
+      <option name="PROGRAM_PARAMETERS" value="-b RandomAgent -w RandomAgent -n 100" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -245,11 +237,7 @@
       <workItem from="1579796779319" duration="16797000" />
       <workItem from="1579962240244" duration="7521000" />
       <workItem from="1579969799974" duration="4117000" />
-      <workItem from="1580131587570" duration="599000" />
-      <workItem from="1580150771034" duration="534000" />
-      <workItem from="1580198794024" duration="26000" />
-      <workItem from="1580658949082" duration="11928000" />
-      <workItem from="1580741032916" duration="10393000" />
+      <workItem from="1580055464531" duration="9165000" />
     </task>
     <servers />
   </component>
@@ -337,22 +325,22 @@
       <screen x="0" y="0" width="1920" height="1032" />
     </state>
     <state x="0" y="0" width="1910" height="1030" key="FileDocumentManager.FileCacheConflict/0.0.1920.1032@0.0.1920.1032" timestamp="1577487267285" />
-    <state width="1874" height="289" key="GridCell.Tab.0.bottom" timestamp="1580151304725">
+    <state width="1874" height="289" key="GridCell.Tab.0.bottom" timestamp="1578268972426">
       <screen x="0" y="0" width="1920" height="1032" />
     </state>
-    <state width="1874" height="289" key="GridCell.Tab.0.bottom/0.0.1920.1032@0.0.1920.1032" timestamp="1580151304725" />
-    <state width="1874" height="289" key="GridCell.Tab.0.center" timestamp="1580151304725">
+    <state width="1874" height="289" key="GridCell.Tab.0.bottom/0.0.1920.1032@0.0.1920.1032" timestamp="1578268972426" />
+    <state width="1874" height="289" key="GridCell.Tab.0.center" timestamp="1578268972425">
       <screen x="0" y="0" width="1920" height="1032" />
     </state>
-    <state width="1874" height="289" key="GridCell.Tab.0.center/0.0.1920.1032@0.0.1920.1032" timestamp="1580151304725" />
-    <state width="1874" height="289" key="GridCell.Tab.0.left" timestamp="1580151304724">
+    <state width="1874" height="289" key="GridCell.Tab.0.center/0.0.1920.1032@0.0.1920.1032" timestamp="1578268972425" />
+    <state width="1874" height="289" key="GridCell.Tab.0.left" timestamp="1578268972424">
       <screen x="0" y="0" width="1920" height="1032" />
     </state>
-    <state width="1874" height="289" key="GridCell.Tab.0.left/0.0.1920.1032@0.0.1920.1032" timestamp="1580151304724" />
-    <state width="1874" height="289" key="GridCell.Tab.0.right" timestamp="1580151304725">
+    <state width="1874" height="289" key="GridCell.Tab.0.left/0.0.1920.1032@0.0.1920.1032" timestamp="1578268972424" />
+    <state width="1874" height="289" key="GridCell.Tab.0.right" timestamp="1578268972426">
       <screen x="0" y="0" width="1920" height="1032" />
     </state>
-    <state width="1874" height="289" key="GridCell.Tab.0.right/0.0.1920.1032@0.0.1920.1032" timestamp="1580151304725" />
+    <state width="1874" height="289" key="GridCell.Tab.0.right/0.0.1920.1032@0.0.1920.1032" timestamp="1578268972426" />
     <state width="1874" height="236" key="GridCell.Tab.1.bottom" timestamp="1578172633303">
       <screen x="0" y="0" width="1920" height="1032" />
     </state>
@@ -401,10 +389,10 @@
       <screen x="0" y="0" width="1920" height="1032" />
     </state>
     <state x="946" y="178" width="869" height="606" key="find.popup/0.0.1920.1032@0.0.1920.1032" timestamp="1578258310711" />
-    <state x="269" y="104" width="1372" height="794" key="new project wizard" timestamp="1580132181464">
+    <state x="269" y="104" width="1372" height="794" key="new project wizard" timestamp="1578172620897">
       <screen x="0" y="0" width="1920" height="1032" />
     </state>
-    <state x="269" y="104" width="1372" height="794" key="new project wizard/0.0.1920.1032@0.0.1920.1032" timestamp="1580132181464" />
+    <state x="269" y="104" width="1372" height="794" key="new project wizard/0.0.1920.1032@0.0.1920.1032" timestamp="1578172620897" />
     <state x="705" y="130" width="500" height="741" key="refactoring.ChangeSignatureDialog" timestamp="1578040407636">
       <screen x="0" y="0" width="1920" height="1032" />
     </state>
@@ -428,10 +416,5 @@
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
-    <watches-manager>
-      <configuration name="Application">
-        <watch expression="Test.PrintBinaryLong(state)" language="JAVA" custom="net.rahka.chess.Test" />
-      </configuration>
-    </watches-manager>
   </component>
 </project>

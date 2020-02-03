@@ -26,13 +26,15 @@ import org.reflections.Reflections;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
-@Slf4j
 public class Application extends javafx.application.Application {
 
 	@NonNull @Getter
@@ -58,8 +60,8 @@ public class Application extends javafx.application.Application {
 
 			final HeuristicSupplier defaultHeuristicSupplier = new HeuristicSupplier("RemainingPiecesHeuristic", RemainingPiecesHeuristic::new);
 
-			final HeuristicSupplier blackHeuristic = (HeuristicSupplier) interpretation.get("blackHeuristic", defaultHeuristicSupplier);
-			final HeuristicSupplier whiteHeuristic = (HeuristicSupplier) interpretation.get("whiteHeuristic", defaultHeuristicSupplier);
+			final HeuristicSupplier blackHeuristic = interpretation.get("blackHeuristic", defaultHeuristicSupplier);
+			final HeuristicSupplier whiteHeuristic = interpretation.get("whiteHeuristic", defaultHeuristicSupplier);
 
 			final AgentSupplier blackAgentSupplier = (AgentSupplier) interpretation.get("black");
 			final AgentSupplier whiteAgentSupplier = (AgentSupplier) interpretation.get("white");
@@ -103,7 +105,7 @@ public class Application extends javafx.application.Application {
 		stage.setWidth(700);
 		stage.setHeight(700);
 
-		visualizer = new Visualizer(() -> getChess().prepare());
+		visualizer = new Visualizer(getChess()::prepare);
 		visualizer.setPieceMoveHandler(this::onChessPieceMoved);
 
 		visualizer.getAgentSuppliers().addAll(AGENT_SUPPLIERS);
@@ -206,16 +208,23 @@ public class Application extends javafx.application.Application {
 			getVisualizer().setCanSelectBlackPieces(player.isBlack());
 			getVisualizer().setCanSelectWhitePieces(player.isWhite());
 
+			Move[] matchingMoves;
 			do {
 				pendingMove.clear();
 				synchronized (pendingMove) {
 					try {
 						pendingMove.wait();
 					} catch (InterruptedException e) {
-						System.out.println("Pending move interrupted, waiting anew!");
+						return null;
 					}
 				}
-			} while (!pendingMove.isPresent() || validMoves.stream().noneMatch(move -> matches(pendingMove.get(), move)));
+				matchingMoves = validMoves.stream().filter(move -> matches(pendingMove.get(), move)).toArray(Move[]::new);
+			} while (!pendingMove.isPresent() || matchingMoves.length == 0);
+
+			if (matchingMoves.length > 1) {
+				Piece[] pieces = Arrays.stream(matchingMoves).map(Move::getThen).toArray(Piece[]::new);
+				pendingMove.move.then = visualizer.showPiecePicker(pieces);
+			}
 
 			previousMove = pendingMove.get();
 			return pendingMove.get();
@@ -234,7 +243,7 @@ public class Application extends javafx.application.Application {
 
 	}
 
-	private class OptionalMove {
+	private static class OptionalMove {
 
 		private Move move;
 

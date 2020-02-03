@@ -180,6 +180,7 @@ public class ChessBoard extends Pane {
 			onSquarePressed(x, y);
 		} else {
 			onPiecePressed(view.getPiece(), x, y, view);
+			onSquarePressed(x, y);
 		}
 	}
 

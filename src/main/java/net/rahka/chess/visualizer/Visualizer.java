@@ -1,5 +1,6 @@
 package net.rahka.chess.visualizer;
 
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
@@ -8,6 +9,7 @@ import javafx.beans.property.ReadOnlyIntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -26,6 +28,9 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
+import javafx.stage.Popup;
+import javafx.stage.Window;
 import lombok.Getter;
 import lombok.NonNull;
 import net.rahka.chess.AgentSupplier;
@@ -36,9 +41,11 @@ import net.rahka.chess.game.Board;
 import net.rahka.chess.game.Match;
 import net.rahka.chess.game.Piece;
 import net.rahka.chess.game.Player;
+import net.rahka.chess.game.State;
 import net.rahka.chess.utils.AdjustableTimer;
 
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 public class Visualizer extends Pane {
@@ -48,6 +55,8 @@ public class Visualizer extends Pane {
 	private final ChessBoard boardView;
 	private final PlayBackView playBackView;
 	private final EditContextMenu menu;
+	private final PiecePickerPane piecePicker;
+	private final Pane shadowPane;
 
 	private final AdjustableTimer moveTimer;
 
@@ -64,6 +73,21 @@ public class Visualizer extends Pane {
 
 	@NonNull @Getter
 	private final ObservableList<HeuristicSupplier> heuristicSuppliers = FXCollections.observableArrayList();
+
+	private final ObjectProperty<String> leftMessageProperty = new SimpleObjectProperty<String>();
+	public String getLeftMessage() {return leftMessageProperty.get();}
+	public void setLeftMessage(String string) {leftMessageProperty.set(string);}
+	public ObjectProperty<String> leftMessageProperty() {return leftMessageProperty;}
+
+	private final ObjectProperty<String> centerMessageProperty = new SimpleObjectProperty<String>();
+	public String getCenterMessage() {return centerMessageProperty.get();}
+	public void setCenterMessage(String string) {centerMessageProperty.set(string);}
+	public ObjectProperty<String> centerMessageProperty() {return centerMessageProperty;}
+
+	private final ObjectProperty<String> rightMessageProperty = new SimpleObjectProperty<String>();
+	public String getRightMessage() {return rightMessageProperty.get();}
+	public void setRightMessage(String string) {rightMessageProperty.set(string);}
+	public ObjectProperty<String> rightMessageProperty() {return rightMessageProperty;}
 
 	private final BooleanProperty canSelectWhitePiecesProperty = new SimpleBooleanProperty(true);
 	public boolean getCanSelectWhitePieces() {return canSelectWhitePiecesProperty.get();}
@@ -85,22 +109,22 @@ public class Visualizer extends Pane {
 	public void setPlaybackControlsDisabled(boolean bool) { playBackControlsDisabledProperty.set(bool);}
 	public BooleanProperty getPlayBackControlsDisabledProperty() {return playBackControlsDisabledProperty;}
 
-	private ObjectProperty<AgentSupplier> whiteAgentHolderProperty;
+	private final ObjectProperty<AgentSupplier> whiteAgentHolderProperty = new SimpleObjectProperty<>();
 	public AgentSupplier getWhiteAgentHolder() {return whiteAgentHolderProperty.get();}
 	public void setWhiteAgentHolder(AgentSupplier agentSupplier) {whiteAgentHolderProperty.set(agentSupplier);}
 	public ObjectProperty<AgentSupplier> whiteAgentHolderProperty() {return whiteAgentHolderProperty;}
 
-	private ObjectProperty<AgentSupplier> blackAgentHolderProperty;
+	private final ObjectProperty<AgentSupplier> blackAgentHolderProperty = new SimpleObjectProperty<>();
 	public AgentSupplier getBlackAgentHolder() {return blackAgentHolderProperty.get();}
 	public void setBlackAgentHolder(AgentSupplier agentSupplier) {blackAgentHolderProperty.set(agentSupplier);}
 	public ObjectProperty<AgentSupplier> blackAgentHolderProperty() {return blackAgentHolderProperty;}
 
-	private ObjectProperty<HeuristicSupplier> whiteHeuristicHolderProperty;
+	private final ObjectProperty<HeuristicSupplier> whiteHeuristicHolderProperty = new SimpleObjectProperty<>();
 	public HeuristicSupplier getWhiteHeuristicHolder() {return whiteHeuristicHolderProperty.get();}
 	public void setWhiteHeuristicHolder(HeuristicSupplier heuristicSupplier) {whiteHeuristicHolderProperty.set(heuristicSupplier);}
 	public ObjectProperty<HeuristicSupplier> whiteHeuristicHolderProperty() {return whiteHeuristicHolderProperty;}
 
-	private ObjectProperty<HeuristicSupplier> blackHeuristicHolderProperty;
+	private final ObjectProperty<HeuristicSupplier> blackHeuristicHolderProperty = new SimpleObjectProperty<>();
 	public HeuristicSupplier getBlackHeuristicHolder() {return blackHeuristicHolderProperty.get();}
 	public void setBlackHeuristicHolder(HeuristicSupplier heuristicSupplier) {blackHeuristicHolderProperty.set(heuristicSupplier);}
 	public ObjectProperty<HeuristicSupplier> blackHeuristicHolderProperty() {return blackHeuristicHolderProperty;}
@@ -125,21 +149,63 @@ public class Visualizer extends Pane {
 		moveTimer = new AdjustableTimer();
 		playBackView.animationRateProperty().addListener(((observable, oldValue, newValue) -> moveTimer.adjust(newValue.intValue())));
 
+		BorderPane messagePane = new BorderPane();
+		messagePane.getStyleClass().add("message-pane");
+		messagePane.prefWidthProperty().bind(widthProperty());
+		messagePane.layoutXProperty().set(0);
+		messagePane.layoutYProperty().bind(heightProperty().subtract(messagePane.heightProperty()));
+
+		var leftMessageLabel = new Label();
+		leftMessageLabel.textProperty().bind(leftMessageProperty());
+		messagePane.setLeft(leftMessageLabel);
+
+		var centerMessageLabel = new Label();
+		centerMessageLabel.textProperty().bind(centerMessageProperty());
+		messagePane.setCenter(centerMessageLabel);
+
+		var rightMessageLabel = new Label();
+		rightMessageLabel.textProperty().bind(rightMessageProperty());
+		messagePane.setRight(rightMessageLabel);
+
+		matchStateProperty().addListener((obs, old, now) -> onMatchStateChange(now));
+
+		blackHeuristicHolderProperty.addListener((ignored) -> calculateBlackHeuristics());
+		whiteHeuristicHolderProperty.addListener((ignored) -> calculateWhiteHeuristics());
+
 		boardView = new ChessBoard();
 		boardView.layoutYProperty().bind(playBackView.heightProperty());
 		boardView.layoutXProperty().bind(widthProperty().divide(2).subtract(boardView.widthProperty().divide(2)));
-		boardView.prefHeightProperty().bind(heightProperty().subtract(playBackView.heightProperty()));
+		boardView.prefHeightProperty().bind(heightProperty().subtract(playBackView.heightProperty()).subtract(messagePane.heightProperty()));
 		boardView.prefWidthProperty().bind(widthProperty());
 		boardView.setSquareMousePressedHandler(this::onSquarePressed);
 		boardView.showThreatsProperty().bind(playBackView.showThreatsProperty());
 		boardView.canSelectBlackProperty().bind(canSelectBlackPiecesProperty());
 		boardView.canSelectWhiteProperty().bind(canSelectWhitePiecesProperty());
 
+		piecePicker = new PiecePickerPane(Piece.getBlack());
+		piecePicker.prefWidth(400);
+		piecePicker.prefWidth(200);
+		piecePicker.layoutXProperty().bind(widthProperty().divide(2).subtract(piecePicker.widthProperty().divide(2)));
+		piecePicker.layoutYProperty().bind(heightProperty().divide(2).subtract(piecePicker.heightProperty().divide(2)));
+		piecePicker.pieceSizeProperty().bind(boardView.heightProperty().divide(8));
+		piecePicker.setVisible(false);
+
+		shadowPane = new Pane();
+		shadowPane.prefWidthProperty().bind(widthProperty());
+		shadowPane.prefHeightProperty().bind(heightProperty());
+		shadowPane.layoutXProperty().set(0);
+		shadowPane.layoutYProperty().set(0);
+		shadowPane.getStyleClass().add("shadow-pane");
+		shadowPane.visibleProperty().bind(piecePicker.visibleProperty());
+
 		setOnMouseMoved(this::onMouseMove);
 		setOnMouseExited(this::onMouseExited);
 
 		getChildren().add(playBackView);
 		getChildren().add(boardView);
+		getChildren().add(messagePane);
+		getChildren().add(shadowPane);
+		getChildren().add(piecePicker);
 
 		boardView.paint();
 
@@ -152,6 +218,38 @@ public class Visualizer extends Pane {
 
 	public ChessBoard.PieceMoveHandler getPieceMoveHandler() {
 		return boardView.getPieceMoveHandler();
+	}
+
+	public Piece showPiecePicker(final Piece[] pieces) {
+		final AtomicReference<Piece> pieceReference = new AtomicReference<>();
+
+		Platform.runLater(() -> {
+			piecePicker.setPieces(pieces);
+			piecePicker.setPiecePressedHandler(p -> {
+				synchronized (pieceReference) {
+					pieceReference.set(p);
+					pieceReference.notifyAll();
+				}
+			});
+
+			piecePicker.setVisible(true);
+		});
+
+		synchronized (pieceReference) {
+			while (pieceReference.get() == null) {
+				try {
+					pieceReference.wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+		Platform.runLater(() -> {
+			piecePicker.setVisible(false);
+		});
+
+		return pieceReference.get();
 	}
 
 	/**
@@ -259,7 +357,9 @@ public class Visualizer extends Pane {
 		match.getBoard().setInitialState(oldInitialState);
 		boardView.setBoardState(match.getBoard().getInitialState());
 
-		match.setOnStateChangeHandler(matchStateProperty::set);
+		match.setOnCurrentPlayerChangeHandler((move) -> Platform.runLater(() -> onCurrentPlayerChange(move)));
+		match.setOnStateChangeHandler((state) -> Platform.runLater(() -> setMatchState(state)));
+		match.setOnBoardStateChangeHandler((move) -> this.nextMove());
 		matchStateProperty.set(Match.State.PREPARED);
 	}
 
@@ -287,7 +387,6 @@ public class Visualizer extends Pane {
 		playBackView.setIsPlaying(false);
 	}
 
-
 	public void previousMove() {
 		synchronized (this) {
 			if (moveIndex > 0) {
@@ -306,13 +405,55 @@ public class Visualizer extends Pane {
 			if (moveIndex < match.getMoves().size() - 1) {
 				long[] state = match.getMoves().get(++moveIndex);
 				boardView.setBoardState(state);
+
+				Platform.runLater(() -> {
+					calculateBlackHeuristics();
+					calculateWhiteHeuristics();
+				});
 			}
+		}
+	}
+
+	private void calculateBlackHeuristics() {
+		var blackHeuristic = getBlackHeuristicHolder().get();
+		if (blackHeuristic != null) {
+			setRightMessage(String.format("Black: %d", blackHeuristic.heuristic(Player.BLACK, new State(match.getBoard()))));
+		}
+	}
+
+	private void calculateWhiteHeuristics() {
+		var whiteHeuristic = getWhiteHeuristicHolder().get();
+		if (whiteHeuristic != null) {
+			setLeftMessage(String.format("White: %d", whiteHeuristic.heuristic(Player.WHITE, new State(match.getBoard()))));
 		}
 	}
 
 	/**
 	 * Events
 	 */
+
+	private void onMatchStateChange(Match.State state) {
+		switch (state) {
+			case PREPARED:
+				setCenterMessage("Ready to start match");
+				break;
+			case ONGOING:
+				break;
+			case INTERRUPTED:
+				setCenterMessage("Match was interrupted");
+				break;
+			case FINISHED:
+				String winner = (getMatch().getWinner().isWhite()) ? "White" : "Black";
+				setCenterMessage(winner + " is the winner");
+				break;
+		}
+	}
+
+	private void onCurrentPlayerChange(Player player) {
+		String playerName = (player.isWhite()) ? "White" : "Black";
+
+		setCenterMessage(playerName + " player is moving...");
+	}
 
 	private void onMouseExited(MouseEvent event) {
 		if (menu.isShowing()) {
@@ -472,22 +613,22 @@ public class Visualizer extends Pane {
 			final var whiteAgentComboBox = new ComboBox<>(getAgentSuppliers());
 			whiteAgentComboBox.disableProperty().bind(matchStateProperty().isEqualTo(Match.State.ONGOING));
 			whiteAgentComboBox.setFocusTraversable(false);
-			whiteAgentHolderProperty = whiteAgentComboBox.valueProperty();
+			whiteAgentHolderProperty().bindBidirectional(whiteAgentComboBox.valueProperty());
 
 			final var blackAgentComboBox = new ComboBox<>(getAgentSuppliers());
 			blackAgentComboBox.disableProperty().bind(matchStateProperty().isEqualTo(Match.State.ONGOING));
 			blackAgentComboBox.setFocusTraversable(false);
-			blackAgentHolderProperty = blackAgentComboBox.valueProperty();
+			blackAgentHolderProperty().bindBidirectional(blackAgentComboBox.valueProperty());
 
 			final var blackAgentHeuristicComboBox = new ComboBox<>(getHeuristicSuppliers());
 			blackAgentHeuristicComboBox.disableProperty().bind(matchStateProperty().isEqualTo(Match.State.ONGOING));
 			blackAgentHeuristicComboBox.setFocusTraversable(false);
-			blackHeuristicHolderProperty = blackAgentHeuristicComboBox.valueProperty();
+			blackHeuristicHolderProperty().bindBidirectional(blackAgentHeuristicComboBox.valueProperty());
 
 			final var whiteAgentHeuristicComboBox = new ComboBox<>(getHeuristicSuppliers());
 			whiteAgentHeuristicComboBox.disableProperty().bind(matchStateProperty().isEqualTo(Match.State.ONGOING));
 			whiteAgentHeuristicComboBox.setFocusTraversable(false);
-			whiteHeuristicHolderProperty = whiteAgentHeuristicComboBox.valueProperty();
+			whiteHeuristicHolderProperty().bindBidirectional(whiteAgentHeuristicComboBox.valueProperty());
 
 			getAgentSuppliers().addListener((ListChangeListener<AgentSupplier>) c -> {
 				final var optional = c.getList().stream().findFirst();
