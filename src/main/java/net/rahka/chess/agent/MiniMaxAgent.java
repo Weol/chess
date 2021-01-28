@@ -1,8 +1,11 @@
 package net.rahka.chess.agent;
 
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import net.rahka.chess.agent.heuristics.Heuristic;
+import net.rahka.chess.agent.heuristics.RemainingPiecesHeuristic;
+import net.rahka.chess.configuration.Configurable;
+import net.rahka.chess.configuration.ConfigurableInt;
 import net.rahka.chess.game.Move;
 import net.rahka.chess.game.Player;
 import net.rahka.chess.game.State;
@@ -11,11 +14,18 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-@RequiredArgsConstructor
+@Configurable(name = "MiniMax")
+@RequiredArgsConstructor()
 public class MiniMaxAgent implements Agent {
 
-    @NonNull @Getter
-    private AgentConfiguration configuration;
+    @Getter @ConfigurableInt(name = "Depth limit", min = 1, def = 3)
+    final int depthLimit;
+
+    @Getter @Configurable(name = "Heuristic", def = RemainingPiecesHeuristic.class)
+    final Heuristic heuristic;
+
+    @Getter
+    final RandomAgent randomAgent;
 
     @Override
     public Move getMove(Player player, Iterator<Move> moves, State state) {
@@ -38,14 +48,13 @@ public class MiniMaxAgent implements Agent {
         }
 
         if (bestMoves.isEmpty()) {
-            Agent randomAgent = new RandomAgent(getConfiguration());
             return randomAgent.getMove(player, moves, state);
         }
         return bestMoves.get((int) (Math.random() * bestMoves.size()));
     }
 
     private int max(Player player, State state, int alpha, int beta, int depth) {
-        if (state.isTerminal() || depth >= getConfiguration().getDepthLimit()) return getConfiguration().getHeuristic().heuristic(player, state);
+        if (state.isTerminal() || depth >= getDepthLimit()) return getHeuristic().heuristic(player, state);
 
         var moves = state.getAllLegalMoves(player);
 
@@ -61,7 +70,7 @@ public class MiniMaxAgent implements Agent {
     }
 
     private int min(Player player, State state, int alpha, int beta, int depth) {
-        if (state.isTerminal() || depth >= getConfiguration().getDepthLimit()) return getConfiguration().getHeuristic().heuristic(player, state);
+        if (state.isTerminal() || depth >= getDepthLimit()) return getHeuristic().heuristic(player, state);
 
         var moves = state.getAllLegalMoves(player.not());
 

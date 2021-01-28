@@ -5,6 +5,7 @@ module net.rahka.chess {
 	requires transitive lombok;
 	requires transitive reflections;
 	requires transitive parameters;
+	requires transitive java.logging;
 
 	exports net.rahka.chess;
 }

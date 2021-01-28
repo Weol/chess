@@ -1,8 +1,7 @@
 package net.rahka.chess.agent;
 
-import lombok.Getter;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import net.rahka.chess.configuration.Configurable;
 import net.rahka.chess.game.Move;
 import net.rahka.chess.game.Player;
 import net.rahka.chess.game.State;
@@ -14,12 +13,9 @@ import java.util.List;
 /**
  * Always chooses a random move
  */
+@Configurable
 @RequiredArgsConstructor
 public class RandomAgent implements Agent {
-
-	@NonNull
-	@Getter
-	private AgentConfiguration configuration;
 
 	@Override
 	public Move getMove(Player player, Iterator<Move> moves, State state) {

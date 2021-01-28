@@ -1,47 +1,31 @@
 package net.rahka.chess.visualizer;
 
 import javafx.application.Platform;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.property.ReadOnlyIntegerProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.ContentDisplay;
-import javafx.scene.control.Label;
-import javafx.scene.control.Slider;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextFormatter;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
-import javafx.stage.Popup;
-import javafx.stage.Window;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import lombok.Getter;
 import lombok.NonNull;
-import net.rahka.chess.AgentSupplier;
-import net.rahka.chess.HeuristicSupplier;
 import net.rahka.chess.IO;
-import net.rahka.chess.agent.AgentConfiguration;
+import net.rahka.chess.agent.Agent;
+import net.rahka.chess.configuration.ConfigurableClass;
 import net.rahka.chess.game.Board;
 import net.rahka.chess.game.Match;
 import net.rahka.chess.game.Piece;
 import net.rahka.chess.game.Player;
-import net.rahka.chess.game.State;
 import net.rahka.chess.utils.AdjustableTimer;
 
 import java.util.Arrays;
@@ -66,13 +50,10 @@ public class Visualizer extends Pane {
 	private Match match;
 
 	@Getter
-	private Supplier<Match> matchSupplier;
+	private final Supplier<Match> matchSupplier;
 
 	@NonNull @Getter
-	private final ObservableList<AgentSupplier> agentSuppliers = FXCollections.observableArrayList();
-
-	@NonNull @Getter
-	private final ObservableList<HeuristicSupplier> heuristicSuppliers = FXCollections.observableArrayList();
+	private final ObservableList<ConfigurableClass<Agent>> agentConfigurables = FXCollections.observableArrayList();
 
 	private final ObjectProperty<String> leftMessageProperty = new SimpleObjectProperty<String>();
 	public String getLeftMessage() {return leftMessageProperty.get();}
@@ -109,25 +90,15 @@ public class Visualizer extends Pane {
 	public void setPlaybackControlsDisabled(boolean bool) { playBackControlsDisabledProperty.set(bool);}
 	public BooleanProperty getPlayBackControlsDisabledProperty() {return playBackControlsDisabledProperty;}
 
-	private final ObjectProperty<AgentSupplier> whiteAgentHolderProperty = new SimpleObjectProperty<>();
-	public AgentSupplier getWhiteAgentHolder() {return whiteAgentHolderProperty.get();}
-	public void setWhiteAgentHolder(AgentSupplier agentSupplier) {whiteAgentHolderProperty.set(agentSupplier);}
-	public ObjectProperty<AgentSupplier> whiteAgentHolderProperty() {return whiteAgentHolderProperty;}
+	private final ObjectProperty<ConfigurableClass<Agent>> whiteAgentHolderProperty = new SimpleObjectProperty<>();
+	public ConfigurableClass<Agent> getWhiteAgentHolder() {return whiteAgentHolderProperty.get();}
+	public void setWhiteAgentHolder(ConfigurableClass<Agent> configurableAgentClass) {whiteAgentHolderProperty.set(configurableAgentClass);}
+	public ObjectProperty<ConfigurableClass<Agent>> whiteAgentHolderProperty() {return whiteAgentHolderProperty;}
 
-	private final ObjectProperty<AgentSupplier> blackAgentHolderProperty = new SimpleObjectProperty<>();
-	public AgentSupplier getBlackAgentHolder() {return blackAgentHolderProperty.get();}
-	public void setBlackAgentHolder(AgentSupplier agentSupplier) {blackAgentHolderProperty.set(agentSupplier);}
-	public ObjectProperty<AgentSupplier> blackAgentHolderProperty() {return blackAgentHolderProperty;}
-
-	private final ObjectProperty<HeuristicSupplier> whiteHeuristicHolderProperty = new SimpleObjectProperty<>();
-	public HeuristicSupplier getWhiteHeuristicHolder() {return whiteHeuristicHolderProperty.get();}
-	public void setWhiteHeuristicHolder(HeuristicSupplier heuristicSupplier) {whiteHeuristicHolderProperty.set(heuristicSupplier);}
-	public ObjectProperty<HeuristicSupplier> whiteHeuristicHolderProperty() {return whiteHeuristicHolderProperty;}
-
-	private final ObjectProperty<HeuristicSupplier> blackHeuristicHolderProperty = new SimpleObjectProperty<>();
-	public HeuristicSupplier getBlackHeuristicHolder() {return blackHeuristicHolderProperty.get();}
-	public void setBlackHeuristicHolder(HeuristicSupplier heuristicSupplier) {blackHeuristicHolderProperty.set(heuristicSupplier);}
-	public ObjectProperty<HeuristicSupplier> blackHeuristicHolderProperty() {return blackHeuristicHolderProperty;}
+	private final ObjectProperty<ConfigurableClass<Agent>> blackAgentHolderProperty = new SimpleObjectProperty<>();
+	public ConfigurableClass<Agent> getBlackAgentHolder() {return blackAgentHolderProperty.get();}
+	public void setBlackAgentHolder(ConfigurableClass<Agent> configurableAgentClass) {blackAgentHolderProperty.set(configurableAgentClass);}
+	public ObjectProperty<ConfigurableClass<Agent>> blackAgentHolderProperty() {return blackAgentHolderProperty;}
 
 	public Visualizer(Supplier<Match> matchSupplier) {
 		this.matchSupplier = matchSupplier;
@@ -168,9 +139,6 @@ public class Visualizer extends Pane {
 		messagePane.setRight(rightMessageLabel);
 
 		matchStateProperty().addListener((obs, old, now) -> onMatchStateChange(now));
-
-		blackHeuristicHolderProperty.addListener((ignored) -> calculateBlackHeuristics());
-		whiteHeuristicHolderProperty.addListener((ignored) -> calculateWhiteHeuristics());
 
 		boardView = new ChessBoard();
 		boardView.layoutYProperty().bind(playBackView.heightProperty());
@@ -335,6 +303,7 @@ public class Visualizer extends Pane {
 	}
 
 	private void startMatch() {
+		/**
 		final var whiteAgentConfiguration = new AgentConfiguration(playBackView.getDepthLimit(), getWhiteHeuristicHolder().get());
 		final var blackAgentConfiguration = new AgentConfiguration(playBackView.getDepthLimit(),  getBlackHeuristicHolder().get());
 
@@ -344,6 +313,7 @@ public class Visualizer extends Pane {
 		moveIndex = -1;
 
 		match.start();
+		 **/
 	}
 
 	private void interruptMatch() {
@@ -405,26 +375,7 @@ public class Visualizer extends Pane {
 			if (moveIndex < match.getMoves().size() - 1) {
 				long[] state = match.getMoves().get(++moveIndex);
 				boardView.setBoardState(state);
-
-				Platform.runLater(() -> {
-					calculateBlackHeuristics();
-					calculateWhiteHeuristics();
-				});
 			}
-		}
-	}
-
-	private void calculateBlackHeuristics() {
-		var blackHeuristic = getBlackHeuristicHolder().get();
-		if (blackHeuristic != null) {
-			setRightMessage(String.format("Black: %d", blackHeuristic.heuristic(Player.BLACK, new State(match.getBoard()))));
-		}
-	}
-
-	private void calculateWhiteHeuristics() {
-		var whiteHeuristic = getWhiteHeuristicHolder().get();
-		if (whiteHeuristic != null) {
-			setLeftMessage(String.format("White: %d", whiteHeuristic.heuristic(Player.WHITE, new State(match.getBoard()))));
 		}
 	}
 
@@ -548,21 +499,21 @@ public class Visualizer extends Pane {
 			previousButton.getStyleClass().add("playback-button");
 			previousButton.setPrefHeight(CHILDREN_HEIGHT);
 			previousButton.setOnAction((ignored) -> onPreviousButtonPressed());
-			previousButton.disableProperty().bind(playBackControlsDisabledProperty);
+			previousButton.disableProperty().bind(playBackControlsDisabledProperty.or(matchStateProperty.isEqualTo(Match.State.ONGOING)));
 			previousButton.setFocusTraversable(false);
 
 			final var nextButton = new ImageButton(IO.image(IO.Images.NEXT));
 			nextButton.getStyleClass().add("playback-button");
 			nextButton.setPrefHeight(CHILDREN_HEIGHT);
 			nextButton.setOnAction((ignored) -> onNextButtonPressed());
-			nextButton.disableProperty().bind(playBackControlsDisabledProperty);
+			nextButton.disableProperty().bind(playBackControlsDisabledProperty.or(matchStateProperty.isEqualTo(Match.State.ONGOING)));
 			nextButton.setFocusTraversable(false);
 
 			final var playPauseButton = new ImageButton(IO.image(IO.Images.PLAY));
 			playPauseButton.getStyleClass().add("playback-button");
 			playPauseButton.setPrefHeight(CHILDREN_HEIGHT);
 			playPauseButton.setOnAction((ignored) -> onPlayPauseButtonPressed());
-			playPauseButton.disableProperty().bind(playBackControlsDisabledProperty);
+			playPauseButton.disableProperty().bind(playBackControlsDisabledProperty.or(matchStateProperty.isEqualTo(Match.State.ONGOING)));
 			playPauseButton.setFocusTraversable(false);
 			isPlayingProperty().addListener((observable, old, now) -> playPauseButton.setImage(this.mapIsPlayingImage(now)));
 
@@ -593,62 +544,40 @@ public class Visualizer extends Pane {
 			animationRateSlider.setPrefWidth(60);
 			animationRateSlider.valueProperty().addListener(((observable, old, now) -> animationRateProperty.set(now.intValue())));
 
-			final var depthLimitTextField = new TextField("4");
-			depthLimitTextField.setMaxWidth(100);
-			depthLimitTextField.setFocusTraversable(false);
-			depthLimitTextField.disableProperty().bind(matchStateProperty().isEqualTo(Match.State.ONGOING));
-			depthLimitTextField.setTextFormatter(new TextFormatter<>(change -> {
-				String text = change.getText();
-
-				if (text.matches("[0-9]*")) {
-					return change;
-				}
-
-				return null;
-			}));
-			depthLimitTextField.textProperty().addListener(((observable, old, now) -> {
-				if (now.length() > 0) depthLimitProperty.set(Integer.parseInt(now));
-			}));
-
-			final var whiteAgentComboBox = new ComboBox<>(getAgentSuppliers());
+			final var whiteAgentComboBox = new ComboBox<>(getAgentConfigurables());
 			whiteAgentComboBox.disableProperty().bind(matchStateProperty().isEqualTo(Match.State.ONGOING));
 			whiteAgentComboBox.setFocusTraversable(false);
 			whiteAgentHolderProperty().bindBidirectional(whiteAgentComboBox.valueProperty());
 
-			final var blackAgentComboBox = new ComboBox<>(getAgentSuppliers());
+			final var whiteAgentSettingsButton = new ImageButton(IO.image(IO.Images.SETTINGS));
+			whiteAgentSettingsButton.getStyleClass().add("playback-button");
+			whiteAgentSettingsButton.disableProperty().bind(matchStateProperty().isEqualTo(Match.State.ONGOING));
+			whiteAgentSettingsButton.prefHeightProperty().bind(whiteAgentComboBox.heightProperty().subtract(4));
+			whiteAgentSettingsButton.setFocusTraversable(false);
+			whiteAgentSettingsButton.onActionProperty().set((ignored) -> onAgentSettingsButtonPressed(Player.WHITE));
+
+			final var blackAgentComboBox = new ComboBox<>(getAgentConfigurables());
 			blackAgentComboBox.disableProperty().bind(matchStateProperty().isEqualTo(Match.State.ONGOING));
 			blackAgentComboBox.setFocusTraversable(false);
 			blackAgentHolderProperty().bindBidirectional(blackAgentComboBox.valueProperty());
 
-			final var blackAgentHeuristicComboBox = new ComboBox<>(getHeuristicSuppliers());
-			blackAgentHeuristicComboBox.disableProperty().bind(matchStateProperty().isEqualTo(Match.State.ONGOING));
-			blackAgentHeuristicComboBox.setFocusTraversable(false);
-			blackHeuristicHolderProperty().bindBidirectional(blackAgentHeuristicComboBox.valueProperty());
+			final var blackAgentSettingsButton = new ImageButton(IO.image(IO.Images.SETTINGS));
+			blackAgentSettingsButton.getStyleClass().add("playback-button");
+			blackAgentSettingsButton.disableProperty().bind(matchStateProperty().isEqualTo(Match.State.ONGOING));
+			blackAgentSettingsButton.prefHeightProperty().bind(blackAgentComboBox.heightProperty().subtract(4));
+			blackAgentSettingsButton.setFocusTraversable(false);
+			blackAgentSettingsButton.onActionProperty().set((ignored) -> onAgentSettingsButtonPressed(Player.BLACK));
 
-			final var whiteAgentHeuristicComboBox = new ComboBox<>(getHeuristicSuppliers());
-			whiteAgentHeuristicComboBox.disableProperty().bind(matchStateProperty().isEqualTo(Match.State.ONGOING));
-			whiteAgentHeuristicComboBox.setFocusTraversable(false);
-			whiteHeuristicHolderProperty().bindBidirectional(whiteAgentHeuristicComboBox.valueProperty());
-
-			getAgentSuppliers().addListener((ListChangeListener<AgentSupplier>) c -> {
+			getAgentConfigurables().addListener((ListChangeListener<ConfigurableClass<Agent>>) c -> {
 				final var optional = c.getList().stream().findFirst();
 				optional.ifPresent(whiteAgentComboBox.valueProperty()::setValue);
 				optional.ifPresent(blackAgentComboBox.valueProperty()::setValue);
-			});
-
-			getHeuristicSuppliers().addListener((ListChangeListener<HeuristicSupplier>) c -> {
-				final var optional = c.getList().stream().findFirst();
-				optional.ifPresent(whiteAgentHeuristicComboBox.valueProperty()::setValue);
-				optional.ifPresent(blackAgentHeuristicComboBox.valueProperty()::setValue);
 			});
 
 			final var showThreatsCheckbox = new CheckBox("Show threats");
 			showThreatsCheckbox.selectedProperty().setValue(true);
 			showThreatsCheckbox.setFocusTraversable(false);
 			showThreatsProperty = showThreatsCheckbox.selectedProperty();
-
-			final var depthLimitLabel = new Label("Depth limit:");
-			depthLimitLabel.setLabelFor(depthLimitTextField);
 
 			final var whiteLabel = new Label("White:");
 			whiteLabel.setLabelFor(whiteAgentComboBox);
@@ -661,17 +590,15 @@ public class Visualizer extends Pane {
 			gridPane.setHgap(10);
 			gridPane.setVgap(10);
 			gridPane.setPadding(new Insets(10, 10, 10, 10));
-			gridPane.add(depthLimitLabel, 0, 0);
-			gridPane.add(depthLimitTextField, 1, 0);
-			gridPane.add(showThreatsCheckbox, 2, 0);
+			gridPane.add(showThreatsCheckbox, 1, 0);
 
 			gridPane.add(whiteLabel, 0, 1);
 			gridPane.add(whiteAgentComboBox, 1, 1);
-			gridPane.add(whiteAgentHeuristicComboBox, 2, 1);
+			gridPane.add(whiteAgentSettingsButton, 2, 1);
 
 			gridPane.add(blackLabel, 0, 2);
 			gridPane.add(blackAgentComboBox, 1, 2);
-			gridPane.add(blackAgentHeuristicComboBox, 2, 2);
+			gridPane.add(blackAgentSettingsButton, 2, 2);
 
 			final var agentsButton = new DropdownPopupButton("Agents", gridPane);
 			agentsButton.setPrefHeight(CHILDREN_HEIGHT);
@@ -698,6 +625,19 @@ public class Visualizer extends Pane {
 			setLeft(leftHBox);
 			setCenter(middleHBox);
 			setRight(rightHBox);
+		}
+
+		private void onAgentSettingsButtonPressed(Player white) {
+			Stage dialog = new Stage();
+			dialog.initModality(Modality.APPLICATION_MODAL);
+			dialog.initOwner(this.getScene().getWindow());
+
+			ClassConfigurer configurer = new ClassConfigurer(whiteAgentHolderProperty.get());
+			configurer.setPadding(new Insets(10));
+
+			Scene dialogScene = new Scene(configurer, 500, 700);
+			dialog.setScene(dialogScene);
+			dialog.show();
 		}
 
 		private Image mapIsPlayingImage(boolean isPlaying) {

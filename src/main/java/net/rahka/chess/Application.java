@@ -5,49 +5,21 @@ import javafx.beans.Observable;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import lombok.Getter;
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 import net.rahka.chess.agent.Agent;
-import net.rahka.chess.agent.AgentConfiguration;
-import net.rahka.chess.agent.heuristics.Heuristic;
-import net.rahka.chess.agent.heuristics.RemainingPiecesHeuristic;
-import net.rahka.chess.game.Board;
-import net.rahka.chess.game.Chess;
-import net.rahka.chess.game.Move;
-import net.rahka.chess.game.Piece;
-import net.rahka.chess.game.Player;
-import net.rahka.chess.game.State;
+import net.rahka.chess.agent.MiniMaxAgent;
+import net.rahka.chess.configuration.Configurable;
+import net.rahka.chess.configuration.ConfigurableClass;
+import net.rahka.chess.configuration.Configuration;
+import net.rahka.chess.game.*;
 import net.rahka.chess.visualizer.Visualizer;
-import net.rahka.parameters.CollectionFlag;
-import net.rahka.parameters.FunctionFlag;
-import net.rahka.parameters.ParameterInterpreter;
-import org.reflections.Reflections;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Stream;
+import java.util.*;
 
 public class Application extends javafx.application.Application {
 
-	@NonNull @Getter
-	private static final List<AgentSupplier> AGENT_SUPPLIERS = new ArrayList<>();
-
-	@NonNull @Getter
-	private static final List<HeuristicSupplier> HEURISTIC_SUPPLIERS = new ArrayList<>();
-
 	public static void main(String[] args) throws InterruptedException {
-		loadAgents();
-		loadHeuristics();
-
 		if (args.length > 0) {
+					/*
 			ParameterInterpreter interpreter = new ParameterInterpreter(
 				new CollectionFlag<>("black", "b", "The agent of the black player", AGENT_SUPPLIERS, true),
 				new CollectionFlag<>("white", "w", "The agent of the white player", AGENT_SUPPLIERS, true),
@@ -63,6 +35,7 @@ public class Application extends javafx.application.Application {
 			final HeuristicSupplier blackHeuristic = interpretation.get("blackHeuristic", defaultHeuristicSupplier);
 			final HeuristicSupplier whiteHeuristic = interpretation.get("whiteHeuristic", defaultHeuristicSupplier);
 
+
 			final AgentSupplier blackAgentSupplier = (AgentSupplier) interpretation.get("black");
 			final AgentSupplier whiteAgentSupplier = (AgentSupplier) interpretation.get("white");
 
@@ -70,10 +43,8 @@ public class Application extends javafx.application.Application {
 
 			final int games = (int) interpretation.get("number");
 
-			var blackConfiguration = new AgentConfiguration(depthLimit, blackHeuristic.get());
-			var whiteConfiguration = new AgentConfiguration(depthLimit, whiteHeuristic.get());
-
 			CLI.run(blackAgentSupplier.getSupplier().apply(blackConfiguration), whiteAgentSupplier.getSupplier().apply(whiteConfiguration), games);
+		 	**/
 		} else {
 			Application.launch();
 		}
@@ -85,6 +56,9 @@ public class Application extends javafx.application.Application {
 	@Getter
 	private Chess chess;
 
+	@Getter
+	private Configuration configuration;
+
 	private final OptionalMove pendingMove = new OptionalMove();
 
 	@Override
@@ -92,6 +66,12 @@ public class Application extends javafx.application.Application {
 		super.init();
 
 		chess = new Chess();
+		configuration = new Configuration("net.rahka.chess", Application.class);
+	}
+
+	@Configurable
+	private static Random random() {
+		return new Random();
 	}
 
 	@Override
@@ -108,31 +88,23 @@ public class Application extends javafx.application.Application {
 		visualizer = new Visualizer(getChess()::prepare);
 		visualizer.setPieceMoveHandler(this::onChessPieceMoved);
 
-		visualizer.getAgentSuppliers().addAll(AGENT_SUPPLIERS);
-		visualizer.getHeuristicSuppliers().addAll(HEURISTIC_SUPPLIERS);
+		visualizer.getAgentConfigurables().addAll(getConfiguration().find(Agent.class));
 
-		visualizer.getAgentSuppliers().add(new AgentSupplier((config) -> new HumanAgent(), "Human"));
 		visualizer.blackAgentHolderProperty().addListener(this::onAgentChosen);
 		visualizer.whiteAgentHolderProperty().addListener(this::onAgentChosen);
 
-		var optionalAgentHolder = visualizer.getAgentSuppliers().stream()
-			.filter((holder) -> holder.getName().equals("MiniMaxAgent"))
+		var optionalAgentHolder = visualizer.getAgentConfigurables().stream()
+			.filter((configurable) -> configurable.getCls().equals(MiniMaxAgent.class))
 			.findAny();
 		optionalAgentHolder.ifPresent(visualizer::setBlackAgentHolder);
 		optionalAgentHolder.ifPresent(visualizer::setWhiteAgentHolder);
-
-		var optionalHeuristicHolder = visualizer.getHeuristicSuppliers().stream()
-			.filter((holder) -> holder.getName().equals("RemainingPiecesHeuristic"))
-			.findAny();
-		optionalHeuristicHolder.ifPresent(visualizer::setBlackHeuristicHolder);
-		optionalHeuristicHolder.ifPresent(visualizer::setWhiteHeuristicHolder);
 
 		stage.setScene(new Scene(visualizer));
 		stage.show();
 	}
 
-	private void onAgentChosen(Observable observable, AgentSupplier old, AgentSupplier now) {
-		if (getVisualizer().getBlackAgentHolder().getName().equals("Human") || getVisualizer().getWhiteAgentHolder().getName().equals("Human")) {
+	private void onAgentChosen(Observable observable, ConfigurableClass<Agent> old, ConfigurableClass<Agent> now) {
+		if (getVisualizer().getBlackAgentHolder().getCls().equals(HumanAgent.class) || getVisualizer().getBlackAgentHolder().getCls().equals(HumanAgent.class)) {
 			getVisualizer().setPlaybackControlsDisabled(true);
 		} else {
 			getVisualizer().setPlaybackControlsDisabled(false);
@@ -145,54 +117,6 @@ public class Application extends javafx.application.Application {
 
 		synchronized (pendingMove) {
 			pendingMove.notifyAll();
-		}
-	}
-
-	private static void loadAgents() {
-		{
-			Reflections reflections = new Reflections("net.rahka.chess.agent");
-
-			Set<Class<? extends Agent>> agentClasses = reflections.getSubTypesOf(Agent.class);
-			agentClasses.stream().sorted(Comparator.comparing(Class::getSimpleName)).forEach((cls) -> {
-				try {
-					Constructor<?> constructor = cls.getConstructor(AgentConfiguration.class);
-					var agentHolder = new AgentSupplier((config) -> {
-						try {
-							return (Agent) constructor.newInstance(config);
-						} catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-							e.printStackTrace();
-						}
-						return null;
-					}, cls.getSimpleName());
-					Application.AGENT_SUPPLIERS.add(agentHolder);
-				} catch (NoSuchMethodException e) {
-					e.printStackTrace();
-				}
-			});
-		}
-	}
-
-	private static void loadHeuristics() {
-		{
-			Reflections reflections = new Reflections("net.rahka.chess.agent.heuristics");
-
-			Set<Class<? extends Heuristic>> heuristicClasses = reflections.getSubTypesOf(Heuristic.class);
-			heuristicClasses.stream().sorted(Comparator.comparing(Class::getSimpleName)).forEach((cls) -> {
-				try {
-					Constructor<?> constructor = cls.getConstructor((Class<?>[]) null);
-					var heuristicHolder = new HeuristicSupplier(cls.getSimpleName(), () -> {
-						try {
-							return (Heuristic) constructor.newInstance();
-						} catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-							e.printStackTrace();
-						}
-						return null;
-					});
-					Application.HEURISTIC_SUPPLIERS.add(heuristicHolder);
-				} catch (NoSuchMethodException e) {
-					e.printStackTrace();
-				}
-			});
 		}
 	}
 

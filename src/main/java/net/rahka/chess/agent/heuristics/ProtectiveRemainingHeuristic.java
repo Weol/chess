@@ -1,9 +1,11 @@
 package net.rahka.chess.agent.heuristics;
 
+import net.rahka.chess.configuration.Configurable;
 import net.rahka.chess.game.Piece;
 import net.rahka.chess.game.Player;
 import net.rahka.chess.game.State;
 
+@Configurable
 public class ProtectiveRemainingHeuristic implements Heuristic {
 
     private int getPieceValue(Piece piece) {
