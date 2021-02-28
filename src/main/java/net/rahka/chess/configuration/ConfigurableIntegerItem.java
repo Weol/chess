@@ -4,6 +4,10 @@ import lombok.Getter;
 
 public class ConfigurableIntegerItem extends ConfigurableItem {
 
+    public static long clamp(long val, long min, long max) {
+        return Math.max(min, Math.min(max, val));
+    }
+
     @Getter
     private final long max, min, def;
 
@@ -21,4 +25,24 @@ public class ConfigurableIntegerItem extends ConfigurableItem {
         }
     }
 
+    @Override
+    ParameterSupplier<?> getSupplier() {
+        var actual = super.getSupplier();
+
+        return () -> {
+            Number value = (Number) actual.get();
+            if (cls.equals(int.class)) {
+                return value.intValue();
+            } else if (cls.equals(long.class)) {
+                return value.longValue();
+            } else if (cls.equals(byte.class)) {
+                return value.byteValue();
+            } else if (cls.equals(short.class)) {
+                return value.shortValue();
+            } else if (cls.equals(char.class)) {
+                return (char) value.byteValue();
+            }
+            throw new IllegalArgumentException("wtf");
+        };
+    }
 }

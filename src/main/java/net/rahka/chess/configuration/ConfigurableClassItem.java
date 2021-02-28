@@ -7,7 +7,7 @@ import java.util.Set;
 public class ConfigurableClassItem extends ConfigurableItem {
 
     @Getter
-    private final Class<?> def;
+    private ConfigurableClass<?> def;
 
     @Getter
     private Set<ConfigurableClass<?>> classes;
@@ -16,6 +16,19 @@ public class ConfigurableClassItem extends ConfigurableItem {
         super(cls, name);
 
         this.classes = classes;
-        this.def = (configurable != null) ? configurable.def() : null;
+        if (configurable != null) {
+            for (var clazz : classes) {
+                if (clazz.getCls().equals(configurable.def())) {
+                    def = clazz;
+                }
+            }
+        }
+
+        if (def == null && classes.size() > 0) {
+            for (var clazz : classes) {
+                def = clazz;
+                break;
+            }
+        }
     }
 }

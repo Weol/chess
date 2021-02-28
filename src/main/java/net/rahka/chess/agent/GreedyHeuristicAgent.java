@@ -3,6 +3,7 @@ package net.rahka.chess.agent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.rahka.chess.agent.heuristics.Heuristic;
+import net.rahka.chess.agent.heuristics.RemainingPiecesHeuristic;
 import net.rahka.chess.configuration.Configurable;
 import net.rahka.chess.game.Move;
 import net.rahka.chess.game.Player;
@@ -16,10 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GreedyHeuristicAgent implements Agent {
 
-    @Getter
-    final int depthLimit;
-
-    @Getter
+    @Getter @Configurable(name = "Heuristic", def = RemainingPiecesHeuristic.class)
     final Heuristic heuristic;
 
     @Getter

@@ -22,13 +22,17 @@ public class ClassConfigurer<T> extends GridPane {
 
     public ClassConfigurer(ConfigurableClass<T> configurableClass) {
         this();
-        setConfigurableClass(configurableClass);
+        if (configurableClass != null) {
+            setConfigurableClass(configurableClass);
+        }
     }
 
     public void setConfigurableClass(ConfigurableClass<T> configurableClass) {
         this.configurableClass = configurableClass;
 
         getChildren().clear();
+
+        currentIndex = 0;
 
         for (ConfigurableItem dependency : configurableClass.getDependencies()) {
             if (dependency.isConfigurableInteger()) {
@@ -50,30 +54,40 @@ public class ClassConfigurer<T> extends GridPane {
     }
 
     private void addClassField(ConfigurableClassItem item) {
+        if (item.getClasses().size() == 1) {
+            for (var cls : item.getClasses()) {
+                if (cls.getDependencies().length == 0) {
+                    item.setSupplier(cls::build);
+                    return;
+                }
+            }
+        }
+
         var classes = FXCollections.<ConfigurableClass<?>>observableArrayList();
 
         ConfigurableClass<?> def = null;
         for (var cls : item.getClasses()) {
+            if (def == null) def = cls;
+
             classes.add(cls);
-            if (cls.getCls().equals(item.getDef())) {
+            if (cls.getCls().equals(item.getDef().getCls())) {
                 def = cls;
             }
         }
 
         var configurer = new ClassConfigurer<>(def);
         configurer.setPadding(new Insets(0, 0, 0, 10));
-        configurer.setVisible(false);
+        configurer.setVisible(def != null);
 
         var paddingRightProperty = Bindings.createDoubleBinding(() -> getPadding().getRight(), paddingProperty());
         var paddingLeftProperty = Bindings.createDoubleBinding(() -> getPadding().getLeft(), paddingProperty());
 
-        final var line = new LabeledLineSeparator("");
+        final var line = new LabeledLineSeparator(def != null ? def.getName() : "");
         line.prefWidthProperty().bind(widthProperty().subtract(paddingRightProperty).subtract(paddingLeftProperty));
-        line.setVisible(false);
 
         final var comboBox = new ComboBox<>(classes);
-        comboBox.setValue(def);
         comboBox.valueProperty().addListener((observable, old, now) -> onClassSelected(item, now, configurer, line));
+        comboBox.setValue(def);
 
         final var label = new Label(item.getName());
         label.setLabelFor(comboBox);
@@ -90,8 +104,8 @@ public class ClassConfigurer<T> extends GridPane {
         currentIndex += 3;
     }
 
-    private <T> void onClassSelected(ConfigurableClassItem item, ConfigurableClass<?> now, final ClassConfigurer<T> configurer, LabeledLineSeparator line) {
-        configurer.setConfigurableClass((ConfigurableClass<T>) now);
+    private <K> void onClassSelected(ConfigurableClassItem item, ConfigurableClass<?> now, final ClassConfigurer<K> configurer, LabeledLineSeparator line) {
+        configurer.setConfigurableClass((ConfigurableClass<K>) now);
         configurer.setVisible(now.getDependencies().length > 0);
         line.setVisible(configurer.isVisible());
         line.setText(now.getName());
@@ -132,7 +146,7 @@ public class ClassConfigurer<T> extends GridPane {
             if (text.length() == 0) return change;
 
             try {
-                Double.parseDouble(text);
+                var value = Double.parseDouble(text);
                 return change;
             } catch (NumberFormatException e) {
                 return null;

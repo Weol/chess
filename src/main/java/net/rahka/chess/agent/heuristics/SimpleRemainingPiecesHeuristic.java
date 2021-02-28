@@ -21,7 +21,7 @@ public class SimpleRemainingPiecesHeuristic implements Heuristic {
     @ConfigurableBoolean(name = "ayy", def = true)
     final boolean ayy;
 
-    @Configurable(name = "Asd")
+    @Configurable(name = "Asd", def = RemainingPiecesHeuristic.class)
     final Heuristic heuristic;
 
     @Override

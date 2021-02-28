@@ -83,10 +83,12 @@ public class Configuration {
 			}
 
 			var invokable = new Invokable(name, cls, params) {
+
 				@Override
 				Object invoke(Object... params) throws InvocationTargetException, IllegalAccessException, InstantiationException {
 					return cls.getConstructors()[0].newInstance(params);
 				}
+
 			};
 
 			configurables.add(invokable);
@@ -221,13 +223,19 @@ public class Configuration {
 	}
 
 	public <T> Set<ConfigurableClass<T>> find(Class<T> cls) {
+		return find(cls, null);
+	}
+
+	<T> Set<ConfigurableClass<T>> find(Class<T> cls, Set<String> except) {
 		var invokables = constructable.get(cls);
 		if (invokables == null || invokables.isEmpty()) {
 			throw new NonConfigurableClassException("Cannot find configurable class " + cls.getName());
 		} else {
 			var set = new HashSet<ConfigurableClass<T>>();
 			for (var invokable : invokables) {
-				set.add(new ConfigurableClass<>(invokable, this));
+				if (except == null || !except.contains(invokable.getType().getName())) {
+					set.add(new ConfigurableClass<>(invokable, this, except));
+				}
 			}
 			return set;
 		}

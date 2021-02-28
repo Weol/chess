@@ -1,12 +1,19 @@
 package net.rahka.chess.agent.heuristics;
 
+import lombok.RequiredArgsConstructor;
 import net.rahka.chess.configuration.Configurable;
 import net.rahka.chess.game.Piece;
 import net.rahka.chess.game.Player;
 import net.rahka.chess.game.State;
 
+import java.util.Random;
+
 @Configurable
+@RequiredArgsConstructor
 public class ProtectiveRemainingHeuristic implements Heuristic {
+
+    @Configurable
+    final Random random;
 
     private int getPieceValue(Piece piece) {
         switch (piece) {

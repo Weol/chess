@@ -11,10 +11,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Paint;
+import javafx.scene.shape.Line;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import lombok.Getter;
@@ -28,6 +27,9 @@ import net.rahka.chess.game.Piece;
 import net.rahka.chess.game.Player;
 import net.rahka.chess.utils.AdjustableTimer;
 
+import java.io.IOError;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
@@ -297,23 +299,22 @@ public class Visualizer extends Pane {
 	private void reset() {
 		synchronized (this) {
 			pause();
-			moveIndex = 0;
+			moveIndex = -1;
 			boardView.setBoardState(match.getBoard().getInitialState());
 		}
 	}
 
 	private void startMatch() {
-		/**
-		final var whiteAgentConfiguration = new AgentConfiguration(playBackView.getDepthLimit(), getWhiteHeuristicHolder().get());
-		final var blackAgentConfiguration = new AgentConfiguration(playBackView.getDepthLimit(),  getBlackHeuristicHolder().get());
+		try {
+			match.setWhiteAgent(getWhiteAgentHolder().build());
+			match.setBlackAgent(getBlackAgentHolder().build());
 
-		match.setWhiteAgent(getWhiteAgentHolder().getSupplier().apply(whiteAgentConfiguration));
-		match.setBlackAgent(getBlackAgentHolder().getSupplier().apply(blackAgentConfiguration));
+			moveIndex = -1;
 
-		moveIndex = -1;
-
-		match.start();
-		 **/
+			match.start();
+		} catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void interruptMatch() {
@@ -474,6 +475,8 @@ public class Visualizer extends Pane {
 
 		private static final int CHILDREN_HEIGHT = 17;
 
+		private ClassConfigurer<Agent> whiteConfigurer, blackConfigurer;
+
 		private final ReadOnlyBooleanProperty showThreatsProperty;
 		public boolean getShowThreats() {return showThreatsProperty.get();}
 		public ReadOnlyBooleanProperty showThreatsProperty() {return showThreatsProperty;}
@@ -495,25 +498,27 @@ public class Visualizer extends Pane {
 			getStyleClass().add("playback-controls");
 			setPadding(new Insets(5, 10, 5, 10));
 
+			final var playBackDisabledProperty = playBackControlsDisabledProperty.or(matchStateProperty.isEqualTo(Match.State.ONGOING)).or(matchStateProperty.isEqualTo(Match.State.PREPARED));
+
 			final var previousButton = new ImageButton(IO.image(IO.Images.PREVIOUS));
 			previousButton.getStyleClass().add("playback-button");
 			previousButton.setPrefHeight(CHILDREN_HEIGHT);
 			previousButton.setOnAction((ignored) -> onPreviousButtonPressed());
-			previousButton.disableProperty().bind(playBackControlsDisabledProperty.or(matchStateProperty.isEqualTo(Match.State.ONGOING)));
+			previousButton.disableProperty().bind(playBackDisabledProperty);
 			previousButton.setFocusTraversable(false);
 
 			final var nextButton = new ImageButton(IO.image(IO.Images.NEXT));
 			nextButton.getStyleClass().add("playback-button");
 			nextButton.setPrefHeight(CHILDREN_HEIGHT);
 			nextButton.setOnAction((ignored) -> onNextButtonPressed());
-			nextButton.disableProperty().bind(playBackControlsDisabledProperty.or(matchStateProperty.isEqualTo(Match.State.ONGOING)));
+			nextButton.disableProperty().bind(playBackDisabledProperty);
 			nextButton.setFocusTraversable(false);
 
 			final var playPauseButton = new ImageButton(IO.image(IO.Images.PLAY));
 			playPauseButton.getStyleClass().add("playback-button");
 			playPauseButton.setPrefHeight(CHILDREN_HEIGHT);
 			playPauseButton.setOnAction((ignored) -> onPlayPauseButtonPressed());
-			playPauseButton.disableProperty().bind(playBackControlsDisabledProperty.or(matchStateProperty.isEqualTo(Match.State.ONGOING)));
+			playPauseButton.disableProperty().bind(playBackDisabledProperty);
 			playPauseButton.setFocusTraversable(false);
 			isPlayingProperty().addListener((observable, old, now) -> playPauseButton.setImage(this.mapIsPlayingImage(now)));
 
@@ -528,7 +533,8 @@ public class Visualizer extends Pane {
 			resetButton.getStyleClass().add("playback-button");
 			resetButton.setPrefHeight(CHILDREN_HEIGHT);
 			resetButton.setOnAction((ignored) -> onResetButtonPressed());
-			resetButton.disableProperty().bind(playBackControlsDisabledProperty);
+			resetButton.disableProperty().bind(playBackDisabledProperty);
+			resetButton.visibleProperty().bind(playBackDisabledProperty.not());
 			resetButton.setFocusTraversable(false);
 
 			final var animationRateSlider = new Slider();
@@ -627,15 +633,60 @@ public class Visualizer extends Pane {
 			setRight(rightHBox);
 		}
 
-		private void onAgentSettingsButtonPressed(Player white) {
-			Stage dialog = new Stage();
+		private void onAgentSettingsButtonPressed(Player player) {
+			final Stage dialog = new Stage();
+			dialog.setTitle("Configuration");
 			dialog.initModality(Modality.APPLICATION_MODAL);
 			dialog.initOwner(this.getScene().getWindow());
 
-			ClassConfigurer configurer = new ClassConfigurer(whiteAgentHolderProperty.get());
+			final int margins = 10;
+
+			var pane = new Pane();
+
+			final var saveButton = new Button("Save");
+			saveButton.getStyleClass().add("bordered-button");
+			saveButton.getStyleClass().add("playback-button");
+			saveButton.layoutXProperty().bind(pane.widthProperty().subtract(saveButton.widthProperty()).subtract(margins));
+			saveButton.layoutYProperty().set(margins);
+			saveButton.onActionProperty().set(e -> dialog.close());
+
+			pane.getChildren().add(saveButton);
+
+			final var titleLabel = new Label("Configuration for " + whiteAgentHolderProperty.get().getName());
+			titleLabel.layoutXProperty().set(10);
+			titleLabel.layoutYProperty().bind(saveButton.layoutYProperty().add(saveButton.heightProperty().divide(2).subtract(titleLabel.heightProperty().divide(2))));
+			pane.getChildren().add(titleLabel);
+
+			ClassConfigurer<Agent> configurer;
+			if (player.isWhite()) {
+				if (whiteConfigurer == null) {
+					whiteConfigurer = new ClassConfigurer<>(whiteAgentHolderProperty.get());
+				}
+				whiteConfigurer.setConfigurableClass(whiteAgentHolderProperty.get());
+				configurer = whiteConfigurer;
+			} else {
+				if (blackConfigurer == null) {
+					blackConfigurer = new ClassConfigurer<>(blackAgentHolderProperty.get());
+				}
+				blackConfigurer.setConfigurableClass(blackAgentHolderProperty.get());
+				configurer = blackConfigurer;
+			}
+			configurer.setStyle("-fx-border-width: 1 0 0 0; -fx-border-color: rgb(128, 128, 128);");
+			configurer.layoutXProperty().set(0);
 			configurer.setPadding(new Insets(10));
 
-			Scene dialogScene = new Scene(configurer, 500, 700);
+			ScrollPane scrollPane = new ScrollPane();
+			scrollPane.layoutXProperty().set(0);
+			scrollPane.layoutYProperty().bind(saveButton.layoutYProperty().add(saveButton.heightProperty()).add(margins));
+			scrollPane.prefWidthProperty().bind(pane.widthProperty());
+			scrollPane.prefHeightProperty().bind(pane.heightProperty().subtract(scrollPane.layoutYProperty()));
+			scrollPane.setContent(configurer);
+			scrollPane.fitToWidthProperty().set(true);
+			pane.getChildren().add(scrollPane);
+
+			configurer.prefWidthProperty().bind(pane.widthProperty().subtract(scrollPane.viewportBoundsProperty().get().getWidth()));
+
+			final Scene dialogScene = new Scene(pane, 300, 300);
 			dialog.setScene(dialogScene);
 			dialog.show();
 		}

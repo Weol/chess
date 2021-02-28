@@ -4,6 +4,7 @@ import lombok.Getter;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
+import java.util.Set;
 
 public class ConfigurableClass<T> {
 
@@ -31,6 +32,8 @@ public class ConfigurableClass<T> {
 
     private final Invokable invokable;
 
+    private Set<String> except;
+
     @Getter
     private final Class<T> cls;
 
@@ -40,11 +43,13 @@ public class ConfigurableClass<T> {
     @Getter
     private final ConfigurableItem[] dependencies;
 
-    public ConfigurableClass(Invokable invokable, Configuration configuration) {
+    @SuppressWarnings("unchecked")
+    public ConfigurableClass(Invokable invokable, Configuration configuration, Set<String> except) {
         this.invokable = invokable;
         this.configuration = configuration;
         this.cls = (Class<T>) invokable.getType();
         this.name = invokable.name;
+        this.except = except;
 
         dependencies = buildDependencies();
     }
@@ -66,43 +71,63 @@ public class ConfigurableClass<T> {
                             configurable = (ConfigurableInt) parameter.getAnnotation();
                         }
 
-                        list[i++] = new ConfigurableIntegerItem(parameter.getCls(), parameter.getName(), configurable);
+                        var item = new ConfigurableIntegerItem(parameter.getCls(), parameter.getName(), configurable);
+                        item.setSupplier(item::getDef);
+                        list[i++] = item;
                     } else if (isFloatingPoint(parameter.getCls())) {
                         ConfigurableFloatingPoint configurable = null;
                         if (parameter.getAnnotation() instanceof ConfigurableFloatingPoint) {
                             configurable = (ConfigurableFloatingPoint) parameter.getAnnotation();
                         }
 
-                        list[i++] = new ConfigurableFloatingPointItem(parameter.getCls(), parameter.getName(), configurable);
+                        var item = new ConfigurableFloatingPointItem(parameter.getCls(), parameter.getName(), configurable);
+                        item.setSupplier(item::getDef);
+                        list[i++] = item;
                     } else if (isBoolean(parameter.getCls())) {
                         ConfigurableBoolean configurable = null;
                         if (parameter.getAnnotation() instanceof ConfigurableBoolean) {
                             configurable = (ConfigurableBoolean) parameter.getAnnotation();
                         }
 
-                        list[i++] = new ConfigurableBooleanItem(parameter.getName(), configurable);
+                        var item = new ConfigurableBooleanItem(parameter.getName(), configurable);
+                        item.setSupplier(item::getDef);
+                        list[i++] = item;
                     } else if (isString(parameter.getCls())) {
                         ConfigurableString configurable = null;
                         if (parameter.getAnnotation() instanceof ConfigurableString) {
                             configurable = (ConfigurableString) parameter.getAnnotation();
                         }
 
-                        list[i++] = new ConfigurableStringItem(parameter.getName(), configurable);
+                        var item = new ConfigurableStringItem(parameter.getName(), configurable);
+                        item.setSupplier(item::getDef);
+                        list[i++] = item;
                     }
                 } else {
-                    var implementations = new HashSet<ConfigurableClass<?>>(configuration.find(parameter.getCls()));
+                    HashSet<ConfigurableClass<?>> implementations;
+                    if (parameter.getCls().isAssignableFrom(cls)) {
+                        if (except == null) {
+                            except = new HashSet<>();
+                        }
+                        except.add(cls.getName());
+                        implementations = new HashSet<>(configuration.find(parameter.getCls(), except));
+                    } else {
+                        implementations = new HashSet<>(configuration.find(parameter.getCls()));
+                    }
 
                     Configurable configurable = null;
                     if (parameter.getAnnotation() instanceof Configurable) {
                         configurable = (Configurable) parameter.getAnnotation();
                     }
 
-                    list[i++] = new ConfigurableClassItem(parameter.getCls(), implementations, parameter.getName(), configurable);
+                    var item = new ConfigurableClassItem(parameter.getCls(), implementations, parameter.getName(), configurable);
+                    item.setSupplier(() -> item.getDef().build());
+                    list[i++] = item;
                 }
             }
         }
     }
 
+    @SuppressWarnings("unchecked")
     public T build() throws IllegalAccessException, InstantiationException, InvocationTargetException {
         var args = new Object[dependencies.length];
         for (int i = 0; i < args.length; i++) {

@@ -70,7 +70,7 @@ public class Application extends javafx.application.Application {
 	}
 
 	@Configurable
-	private static Random random() {
+	private static Random random(int asd) {
 		return new Random();
 	}
 

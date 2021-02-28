@@ -11,9 +11,6 @@ import javafx.scene.shape.Line;
 
 public class LabeledLineSeparator extends Pane {
 
-    private Line firstLine = new Line(), secondLine = new Line();
-    private Label label = new Label();
-
     private final DoubleProperty labelOffsetRatioProperty = new SimpleDoubleProperty(0.2);
     public double getLabelOffsetRatio() {return labelOffsetRatioProperty.get();}
     public void setLabelOffsetRatio(double value) {labelOffsetRatioProperty.set(value);}
@@ -41,12 +38,15 @@ public class LabeledLineSeparator extends Pane {
     public LabeledLineSeparator(String text, double ratio) {
         setText(text);
 
+        Label label = new Label();
         label.textProperty().bind(textProperty());
         label.textFillProperty().bind(colorProperty());
 
         labelOffsetRatioProperty().set(ratio);
 
+        Line firstLine = new Line();
         firstLine.strokeProperty().bind(colorProperty());
+        Line secondLine = new Line();
         secondLine.strokeProperty().bind(colorProperty());
 
         firstLine.startXProperty().set(0);

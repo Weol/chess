@@ -10,13 +10,13 @@ import java.util.function.Supplier;
 @RequiredArgsConstructor
 public class ConfigurableItem {
 
-    private final Class<?> cls;
+    final Class<?> cls;
 
     @Getter
     private final String name;
 
     @Getter(AccessLevel.PACKAGE) @Setter
-    private Supplier<?> supplier;
+    private ParameterSupplier<?> supplier;
 
     public boolean isConfigurableInteger() {
         return (this instanceof ConfigurableIntegerItem);
