@@ -12,18 +12,6 @@ import net.rahka.chess.game.State;
 @RequiredArgsConstructor
 public class SimpleRemainingPiecesHeuristic implements Heuristic {
 
-    @ConfigurableString(name = "lmao", def = "Kek 2k")
-    final String lmao;
-
-    @ConfigurableFloatingPoint(name = "kek", def = 232.12)
-    final double kek;
-
-    @ConfigurableBoolean(name = "ayy", def = true)
-    final boolean ayy;
-
-    @Configurable(name = "Asd", def = RemainingPiecesHeuristic.class)
-    final Heuristic heuristic;
-
     @Override
     public int heuristic(Player player, State state) {
         return state.remainingPieces(player) - state.remainingPieces(player.not());

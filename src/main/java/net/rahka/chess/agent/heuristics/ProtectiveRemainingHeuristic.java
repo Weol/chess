@@ -12,9 +12,6 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class ProtectiveRemainingHeuristic implements Heuristic {
 
-    @Configurable
-    final Random random;
-
     private int getPieceValue(Piece piece) {
         switch (piece) {
             case WHITE_PAWN:

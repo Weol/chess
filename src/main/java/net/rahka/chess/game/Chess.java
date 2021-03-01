@@ -7,7 +7,7 @@ import java.util.Arrays;
 public class Chess {
 
 	public Match prepare() {
-		final Match match = new Match(createBoard());
+		final Match match = new Match(createDefaultBoard());
 		match.setMatchState(Match.State.PREPARED);
 
 		match.thread = new Thread(() -> {
@@ -29,10 +29,12 @@ public class Chess {
 		board.state = Arrays.copyOf(board.getInitialState(), 12);
 
 		Player winner = null;
+		boolean draw = false;
 		while (winner == null && !Thread.currentThread().isInterrupted()) {
 			{
 				match.setCurrentPlayer(Player.WHITE);
-				var move = whiteAgent.getMove(Player.WHITE, board.getAllLegalMoves(Player.WHITE), new State(board));
+				var legalMoves = board.getAllLegalMoves(Player.WHITE);
+				var move = whiteAgent.getMove(Player.WHITE, legalMoves, new State(board));
 
 				//int fromI = Long.numberOfTrailingZeros(board.getState(move.piece) & move.move);
 				//int toI = Long.numberOfTrailingZeros((board.getState(move.piece) & move.move) ^ move.move);
@@ -52,7 +54,8 @@ public class Chess {
 
 			if (winner == null && !Thread.currentThread().isInterrupted()) {
 				match.setCurrentPlayer(Player.BLACK);
-				var move = blackAgent.getMove(Player.BLACK, board.getAllLegalMoves(Player.BLACK), new State(board));
+				var legalMoves = board.getAllLegalMoves(Player.BLACK);
+				var move = blackAgent.getMove(Player.BLACK, legalMoves, new State(board));
 
 				//int fromI = Long.numberOfLeadingZeros(board.getState(move.piece) & move.move);
 				//int toI = Long.numberOfLeadingZeros((board.getState(move.piece) & move.move) ^ move.move);
@@ -78,7 +81,7 @@ public class Chess {
 		return winner;
 	}
 
-	private Board createBoard() {
+	private Board createDefaultBoard() {
 		return new Board(new long[] {
 				0b00000000_00000000_00000000_00000000_00000000_00000000_11111111_00000000L,
 				0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_10000001L,

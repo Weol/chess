@@ -9,7 +9,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 
-public class LabeledLineSeparator extends Pane {
+class LabeledLineSeparator extends Pane {
 
     private final DoubleProperty labelOffsetRatioProperty = new SimpleDoubleProperty(0.2);
     public double getLabelOffsetRatio() {return labelOffsetRatioProperty.get();}

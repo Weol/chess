@@ -9,7 +9,7 @@ import net.rahka.chess.configuration.*;
 
 import java.lang.reflect.InvocationTargetException;
 
-public class ClassConfigurer<T> extends GridPane {
+class ClassConfigurer<T> extends GridPane {
 
     private int currentIndex = 0;
 

@@ -15,7 +15,7 @@ import net.rahka.chess.game.Player;
 
 import java.util.function.Consumer;
 
-public class EditContextMenu extends ContextMenu {
+class EditContextMenu extends ContextMenu {
 
     private final ObjectProperty<SpawnAction> spawnActionProperty = new SimpleObjectProperty<SpawnAction>(null);
     public SpawnAction getSpawnAction() {return spawnActionProperty.get();}
@@ -47,6 +47,10 @@ public class EditContextMenu extends ContextMenu {
     public void setClearAction(ClearAction clearAction) {clearActionProperty.set(clearAction);}
     public ObjectProperty<ClearAction> clearActionProperty() {return clearActionProperty;}
 
+    private final ObjectProperty<Piece> pieceProperty = new SimpleObjectProperty<Piece>();
+    private Piece getPiece() {return pieceProperty.get();}
+    private void setPiece(Piece piece) {pieceProperty.set(piece);}
+
     @NonNull @Getter
     final MenuItem killMenuitem;
 
@@ -63,9 +67,6 @@ public class EditContextMenu extends ContextMenu {
     final MenuItem clearMenuItem;
 
     @Setter
-    private Piece piece;
-
-    @Setter
     private int x, y;
 
     public EditContextMenu() {
@@ -73,7 +74,7 @@ public class EditContextMenu extends ContextMenu {
 
         killMenuitem = new MenuItem("Kill");
         killMenuitem.setOnAction((ignored) -> doKillAction());
-        killMenuitem.visibleProperty().bind(killActionProperty().isNotNull());
+        killMenuitem.visibleProperty().bind(killActionProperty().isNotNull().and(pieceProperty.isNotNull()));
 
         spawnMenu = new Menu("Spawn");
         spawnMenu.visibleProperty().bind(spawnActionProperty().isNotNull());
@@ -167,6 +168,8 @@ public class EditContextMenu extends ContextMenu {
     }
 
     public void show(Node anchor, double screenX, double screenY, Piece piece, int boardX, int boardY) {
+        hide(); // Hide any sub-menus if they are still visible
+
         setX(boardX);
         setY(boardY);
         setPiece(piece);
@@ -187,8 +190,8 @@ public class EditContextMenu extends ContextMenu {
 
     private void doKillAction() {
         var action = getKillAction();
-        if (action != null) {
-            action.kill(piece, x, y);
+        if (action != null && getPiece() != null) {
+            action.kill(getPiece(), x, y);
         }
     }
 

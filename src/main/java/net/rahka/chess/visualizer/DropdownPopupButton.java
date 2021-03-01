@@ -11,7 +11,7 @@ import javafx.stage.Popup;
 import javafx.stage.Window;
 import net.rahka.chess.IO;
 
-public class DropdownPopupButton extends Button {
+class DropdownPopupButton extends Button {
 
 	private static final int Y_OFFSET = 5;
 

@@ -1,20 +1,26 @@
 package net.rahka.chess.visualizer;
 
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
-import javafx.scene.shape.Line;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Modality;
+import javafx.stage.Popup;
 import javafx.stage.Stage;
 import lombok.Getter;
 import lombok.NonNull;
@@ -27,8 +33,6 @@ import net.rahka.chess.game.Piece;
 import net.rahka.chess.game.Player;
 import net.rahka.chess.utils.AdjustableTimer;
 
-import java.io.IOError;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
@@ -42,11 +46,9 @@ public class Visualizer extends Pane {
 	private final PlayBackView playBackView;
 	private final EditContextMenu menu;
 	private final PiecePickerPane piecePicker;
-	private final Pane shadowPane;
+	private final PlaybackBar playBackBar;
 
 	private final AdjustableTimer moveTimer;
-
-	private int moveIndex;
 
 	@NonNull @Getter
 	private Match match;
@@ -56,6 +58,10 @@ public class Visualizer extends Pane {
 
 	@NonNull @Getter
 	private final ObservableList<ConfigurableClass<Agent>> agentConfigurables = FXCollections.observableArrayList();
+
+	private final IntegerProperty moveIndexProperty = new SimpleIntegerProperty(0);
+	public int getMoveIndex() {return moveIndexProperty.get();}
+	public IntegerProperty moveIndexProperty() {return moveIndexProperty;}
 
 	private final ObjectProperty<String> leftMessageProperty = new SimpleObjectProperty<String>();
 	public String getLeftMessage() {return leftMessageProperty.get();}
@@ -87,7 +93,7 @@ public class Visualizer extends Pane {
 	public void setMatchState(Match.State state) {matchStateProperty.set(state);}
 	public ObjectProperty<Match.State> matchStateProperty() {return matchStateProperty;}
 
-	private BooleanProperty playBackControlsDisabledProperty = new SimpleBooleanProperty(false);
+	private final BooleanProperty playBackControlsDisabledProperty = new SimpleBooleanProperty(false);
 	public boolean isPlaybackControlsDisabled() {return playBackControlsDisabledProperty.get();}
 	public void setPlaybackControlsDisabled(boolean bool) { playBackControlsDisabledProperty.set(bool);}
 	public BooleanProperty getPlayBackControlsDisabledProperty() {return playBackControlsDisabledProperty;}
@@ -121,6 +127,14 @@ public class Visualizer extends Pane {
 
 		moveTimer = new AdjustableTimer();
 		playBackView.animationRateProperty().addListener(((observable, oldValue, newValue) -> moveTimer.adjust(newValue.intValue())));
+
+		var playBackControlsShadowPane = new Pane();
+		playBackControlsShadowPane.setEffect(new DropShadow(5, Color.gray(0.5)));
+		playBackControlsShadowPane.setBackground(new Background(new BackgroundFill(Color.gray(1), CornerRadii.EMPTY, Insets.EMPTY)));
+		playBackControlsShadowPane.layoutXProperty().bind(playBackView.layoutXProperty());
+		playBackControlsShadowPane.layoutYProperty().bind(playBackView.layoutYProperty());
+		playBackControlsShadowPane.prefWidthProperty().bind(playBackView.widthProperty());
+		playBackControlsShadowPane.prefHeightProperty().bind(playBackView.heightProperty());
 
 		BorderPane messagePane = new BorderPane();
 		messagePane.getStyleClass().add("message-pane");
@@ -160,21 +174,39 @@ public class Visualizer extends Pane {
 		piecePicker.pieceSizeProperty().bind(boardView.heightProperty().divide(8));
 		piecePicker.setVisible(false);
 
-		shadowPane = new Pane();
-		shadowPane.prefWidthProperty().bind(widthProperty());
-		shadowPane.prefHeightProperty().bind(heightProperty());
-		shadowPane.layoutXProperty().set(0);
-		shadowPane.layoutYProperty().set(0);
-		shadowPane.getStyleClass().add("shadow-pane");
-		shadowPane.visibleProperty().bind(piecePicker.visibleProperty());
+		Pane piecePickerShadowPane = new Pane();
+		piecePickerShadowPane.prefWidthProperty().bind(widthProperty());
+		piecePickerShadowPane.prefHeightProperty().bind(heightProperty());
+		piecePickerShadowPane.layoutXProperty().set(0);
+		piecePickerShadowPane.layoutYProperty().set(0);
+		piecePickerShadowPane.getStyleClass().add("shadow-pane");
+		piecePickerShadowPane.visibleProperty().bind(piecePicker.visibleProperty());
+
+		playBackBar = new PlaybackBar();
+		playBackBar.prefWidthProperty().bind(widthProperty());
+		playBackBar.prefHeightProperty().set(2);
+		playBackBar.layoutXProperty().set(0);
+		playBackBar.layoutYProperty().bind(playBackView.layoutYProperty().add(playBackView.heightProperty()));
+
+		final var playBackBarShadowPane = new Pane();
+		playBackBarShadowPane.setCursor(Cursor.HAND);
+		playBackBarShadowPane.prefWidthProperty().bind(widthProperty());
+		playBackBarShadowPane.prefHeightProperty().set(8);
+		playBackBarShadowPane.layoutXProperty().set(0);
+		playBackBarShadowPane.layoutYProperty().bind(playBackBar.layoutYProperty().subtract(3));
+		playBackBarShadowPane.setOnMousePressed(playBackBar::onPlayBackBarPressed);
+		playBackBarShadowPane.setOnMouseDragged(playBackBar::onPlayBackBarPressed);
 
 		setOnMouseMoved(this::onMouseMove);
 		setOnMouseExited(this::onMouseExited);
 
-		getChildren().add(playBackView);
 		getChildren().add(boardView);
+		getChildren().add(playBackControlsShadowPane);
+		getChildren().add(playBackBar);
+		getChildren().add(playBackView);
+		getChildren().add(playBackBarShadowPane);
 		getChildren().add(messagePane);
-		getChildren().add(shadowPane);
+		getChildren().add(piecePickerShadowPane);
 		getChildren().add(piecePicker);
 
 		boardView.paint();
@@ -267,6 +299,7 @@ public class Visualizer extends Pane {
 		for (Piece piece : Piece.of(player)) {
 			match.getBoard().setState(piece, 0);
 		}
+
 		match.getBoard().setInitialState(Arrays.copyOf(match.getBoard().getState(), 12));
 		boardView.setBoardState(match.getBoard().getInitialState());
 	}
@@ -299,7 +332,7 @@ public class Visualizer extends Pane {
 	private void reset() {
 		synchronized (this) {
 			pause();
-			moveIndex = -1;
+			setMoveIndex(-1);
 			boardView.setBoardState(match.getBoard().getInitialState());
 		}
 	}
@@ -309,7 +342,7 @@ public class Visualizer extends Pane {
 			match.setWhiteAgent(getWhiteAgentHolder().build());
 			match.setBlackAgent(getBlackAgentHolder().build());
 
-			moveIndex = -1;
+			setMoveIndex(-1);
 
 			match.start();
 		} catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
@@ -325,13 +358,16 @@ public class Visualizer extends Pane {
 		long[] oldInitialState = match.getBoard().getInitialState();
 
 		match = matchSupplier.get();
-		match.getBoard().setInitialState(oldInitialState);
+		match.getBoard().setInitialState(Arrays.copyOf(oldInitialState, 12));
+		match.getBoard().setState(Arrays.copyOf(oldInitialState, 12));
 		boardView.setBoardState(match.getBoard().getInitialState());
 
 		match.setOnCurrentPlayerChangeHandler((move) -> Platform.runLater(() -> onCurrentPlayerChange(move)));
 		match.setOnStateChangeHandler((state) -> Platform.runLater(() -> setMatchState(state)));
 		match.setOnBoardStateChangeHandler((move) -> this.nextMove());
 		matchStateProperty.set(Match.State.PREPARED);
+
+		setMoveIndex(-1);
 	}
 
 	/**
@@ -343,7 +379,7 @@ public class Visualizer extends Pane {
 			moveTimer.start(() -> {
 				nextMove();
 
-				if (moveIndex == match.getMoves().size() - 1 && match.getState() != Match.State.ONGOING) {
+				if (getMoveIndex() == match.getMoves().size() - 1 && match.getState() != Match.State.ONGOING) {
 					pause();
 				}
 			}, playBackView.animationRateProperty.getValue());
@@ -358,26 +394,28 @@ public class Visualizer extends Pane {
 		playBackView.setIsPlaying(false);
 	}
 
-	public void previousMove() {
+	public void setMoveIndex(int index) {
 		synchronized (this) {
-			if (moveIndex > 0) {
-				long[] state = match.getMoves().get(--moveIndex);
-				boardView.setBoardState(state);
-			} else if (moveIndex == 0) {
-				long[] state = match.getBoard().getInitialState();
-				boardView.setBoardState(state);
-				moveIndex--;
+			index = Math.max(-1, Math.min(match.getMoves().size() - 1, index));
+
+			long[] state;
+			if (index < 0) {
+				state = match.getBoard().getInitialState();
+			} else {
+				state = match.getMoves().get(index);
 			}
+
+			moveIndexProperty.set(index);
+			boardView.setBoardState(state);
 		}
 	}
 
+	public void previousMove() {
+		setMoveIndex(getMoveIndex() - 1);
+	}
+
 	public void nextMove() {
-		synchronized (this) {
-			if (moveIndex < match.getMoves().size() - 1) {
-				long[] state = match.getMoves().get(++moveIndex);
-				boardView.setBoardState(state);
-			}
-		}
+		setMoveIndex(getMoveIndex() + 1);
 	}
 
 	/**
@@ -490,14 +528,7 @@ public class Visualizer extends Pane {
 		public void setIsPlaying(boolean value) {isPlayingProperty.set(value);}
 		public BooleanProperty isPlayingProperty() {return isPlayingProperty;}
 
-		private final IntegerProperty depthLimitProperty = new SimpleIntegerProperty(4);
-		public int getDepthLimit() {return depthLimitProperty.get();}
-		public ReadOnlyIntegerProperty depthLimitProperty() {return depthLimitProperty;}
-
 		public PlayBackView() {
-			getStyleClass().add("playback-controls");
-			setPadding(new Insets(5, 10, 5, 10));
-
 			final var playBackDisabledProperty = playBackControlsDisabledProperty.or(matchStateProperty.isEqualTo(Match.State.ONGOING)).or(matchStateProperty.isEqualTo(Match.State.PREPARED));
 
 			final var previousButton = new ImageButton(IO.image(IO.Images.PREVIOUS));
@@ -613,16 +644,19 @@ public class Visualizer extends Pane {
 
 			final var leftHBox = new HBox(10);
 			leftHBox.setAlignment(Pos.CENTER_LEFT);
+			leftHBox.setPadding(new Insets(5, 10, 5, 10));
 			leftHBox.getChildren().add(agentsButton);
 			leftHBox.getChildren().add(animationRateSlider);
 
 			final var middleHBox = new HBox(10);
 			middleHBox.setAlignment(Pos.CENTER);
+			middleHBox.setPadding(new Insets(5, 10, 5, 10));
 			middleHBox.getChildren().add(previousButton);
 			middleHBox.getChildren().add(playPauseButton);
 			middleHBox.getChildren().add(nextButton);
 
 			final var rightHBox = new HBox(10);
+			rightHBox.setPadding(new Insets(5, 10, 5, 10));
 			rightHBox.setAlignment(Pos.CENTER_RIGHT);
 			rightHBox.getChildren().add(resetButton);
 			rightHBox.getChildren().add(startStopButton);
@@ -703,6 +737,44 @@ public class Visualizer extends Pane {
 					return IO.image(IO.Images.STOP);
 				default:
 					return IO.image(IO.Images.TRASH);
+			}
+		}
+
+	}
+
+	public class PlaybackBar extends Pane {
+
+		public PlaybackBar() {
+			setBackground(new Background(new BackgroundFill(Color.gray(0.8), CornerRadii.EMPTY, Insets.EMPTY)));
+
+			Rectangle playedBar = new Rectangle();
+			playedBar.strokeProperty().set(Paint.valueOf("#bf0000"));
+			playedBar.fillProperty().set(Paint.valueOf("#bf0000"));
+			playedBar.xProperty().set(0);
+			playedBar.yProperty().set(0);
+			playedBar.heightProperty().bind(heightProperty());
+			playedBar.setMouseTransparent(true);
+
+			moveIndexProperty.addListener((obs, old, now) -> {
+				int index = now.intValue() + 1;
+
+				double width;
+				if (match != null && index > 0) {
+					width = getWidth() / (match.getMoves().size()) * index;
+				} else {
+					width = 0;
+				}
+
+				playedBar.setWidth(Math.max(0, Math.min(width, getWidth())));
+			});
+
+			getChildren().addAll(playedBar);
+		}
+
+		private void onPlayBackBarPressed(MouseEvent e) {
+			if (match != null && getMatchState() != Match.State.ONGOING && getMatchState() != Match.State.PREPARED) {
+				int index = (int) Math.round(e.getX() / playBackBar.widthProperty().divide(match.getMoves().size()).get());
+				setMoveIndex(index - 1);
 			}
 		}
 

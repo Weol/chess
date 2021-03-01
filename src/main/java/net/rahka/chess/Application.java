@@ -69,11 +69,6 @@ public class Application extends javafx.application.Application {
 		configuration = new Configuration("net.rahka.chess", Application.class);
 	}
 
-	@Configurable
-	private static Random random(int asd) {
-		return new Random();
-	}
-
 	@Override
 	public void start(Stage stage) throws Exception {
 		javafx.application.Application.setUserAgentStylesheet(javafx.application.Application.STYLESHEET_MODENA);

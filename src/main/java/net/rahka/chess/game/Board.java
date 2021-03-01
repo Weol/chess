@@ -16,7 +16,7 @@ public class Board {
 		return (-0x8000000000000000L >>> (63 - (y * 8 + x)));
 	}
 
-	@Getter
+	@Getter @Setter
 	long[] state;
 
 	@Getter @Setter
@@ -28,20 +28,7 @@ public class Board {
 	}
 
 	public Board(Board board) {
-		this(new long[] {
-			board.state[0],
-			board.state[1],
-			board.state[2],
-			board.state[3],
-			board.state[4],
-			board.state[5],
-			board.state[6],
-			board.state[7],
-			board.state[8],
-			board.state[9],
-			board.state[10],
-			board.state[11],
-		});
+		this(Arrays.copyOf(board.getState(), 12));
 	}
 
 	public long getState(Piece piece) {

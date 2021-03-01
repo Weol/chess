@@ -71,12 +71,4 @@ public class Match {
 		}
 	}
 
-	public void join() {
-		try {
-			thread.join();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
-
 }

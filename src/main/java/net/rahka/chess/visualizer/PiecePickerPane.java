@@ -27,7 +27,7 @@ import java.io.PrintWriter;
 import java.util.Calendar;
 import java.util.function.Consumer;
 
-public class PiecePickerPane extends HBox {
+class PiecePickerPane extends HBox {
 
 	private static final int PIECE_PADDING = 10;
 
