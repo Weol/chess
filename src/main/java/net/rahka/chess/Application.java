@@ -17,6 +17,8 @@ import java.util.*;
 
 public class Application extends javafx.application.Application {
 
+	private static Application application;
+
 	public static void main(String[] args) throws InterruptedException {
 		if (args.length > 0) {
 					/*
@@ -50,6 +52,11 @@ public class Application extends javafx.application.Application {
 		}
 	}
 
+	@Configurable
+	public static Application application() {
+		return application;
+	}
+
 	@Getter
 	private Visualizer visualizer;
 
@@ -64,6 +71,8 @@ public class Application extends javafx.application.Application {
 	@Override
 	public void init() throws Exception {
 		super.init();
+
+		application = this;
 
 		chess = new Chess();
 		configuration = new Configuration("net.rahka.chess", Application.class);
@@ -115,6 +124,7 @@ public class Application extends javafx.application.Application {
 		}
 	}
 
+	@Configurable(name = "HumanAgent")
 	public class HumanAgent implements Agent {
 
 		private Move previousMove;
