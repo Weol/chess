@@ -38,11 +38,11 @@ public class RemainingPiecesHeuristic implements Heuristic {
     public int heuristic(Player player, State state) {
         int alliedSum = 0, enemySum = 0;
         for (Piece piece : Piece.of(player)) {
-            alliedSum += getPieceValue(piece) * state.remainingPieces(piece);
+            alliedSum += getPieceValue(piece) * state.getPieceCount(piece);
         }
 
         for (Piece piece : Piece.of(player.not())) {
-            enemySum += getPieceValue(piece) * state.remainingPieces(piece);
+            enemySum += getPieceValue(piece) * state.getPieceCount(piece);
         }
 
         return alliedSum - enemySum;

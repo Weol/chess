@@ -61,9 +61,6 @@ public class Application extends javafx.application.Application {
 	private Visualizer visualizer;
 
 	@Getter
-	private Chess chess;
-
-	@Getter
 	private Configuration configuration;
 
 	private final OptionalMove pendingMove = new OptionalMove();
@@ -74,7 +71,6 @@ public class Application extends javafx.application.Application {
 
 		application = this;
 
-		chess = new Chess();
 		configuration = new Configuration("net.rahka.chess", Application.class);
 	}
 
@@ -89,7 +85,7 @@ public class Application extends javafx.application.Application {
 		stage.setWidth(700);
 		stage.setHeight(700);
 
-		visualizer = new Visualizer(getChess()::prepare);
+		visualizer = new Visualizer();
 		visualizer.setPieceMoveHandler(this::onChessPieceMoved);
 
 		visualizer.getAgentConfigurables().addAll(getConfiguration().find(Agent.class));
@@ -116,8 +112,7 @@ public class Application extends javafx.application.Application {
 	}
 
 	private void onChessPieceMoved(Piece piece, int fromX, int fromY, int toX, int toY) {
-		long move = Board.kernelOf(fromX, fromY) | Board.kernelOf(toX, toY);
-		pendingMove.set(new Move(piece, move));
+		pendingMove.set(new Move(piece, fromX, fromY, toX, toY));
 
 		synchronized (pendingMove) {
 			pendingMove.notifyAll();
@@ -130,9 +125,8 @@ public class Application extends javafx.application.Application {
 		private Move previousMove;
 
 		@Override
-		public Move getMove(Player player, Iterator<Move> moves, State state) {
-			Set<Move> validMoves = new HashSet<>();
-			moves.forEachRemaining(validMoves::add);
+		public Move getMove(Player player, Collection<Move> moves, State state) {
+			Set<Move> validMoves = new HashSet<>(moves);
 
 			getVisualizer().setCanSelectBlackPieces(player.isBlack());
 			getVisualizer().setCanSelectWhitePieces(player.isWhite());
@@ -161,13 +155,6 @@ public class Application extends javafx.application.Application {
 
 		private boolean matches(Move m1, Move m2) {
 			return (m1.move == m2.move && m1.piece == m2.piece);
-		}
-
-		@Override
-		public void postMove(Move move) {
-			if (move == previousMove) {
-				getVisualizer().nextMove();
-			}
 		}
 
 	}

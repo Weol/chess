@@ -1,115 +1,70 @@
 package net.rahka.chess.game;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-public class State extends Board {
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
-    private final int[] remainingPieces;
+@RequiredArgsConstructor
+public class State {
 
-    @Getter(lazy = true)
-    private final int remainingWhitePieces = calculateRemainingWhitePieces();
+    @Getter
+    private final long[] board;
 
-    @Getter(lazy = true)
-    private final int remainingBlackPieces = calculateRemainingBlackPieces();
+    @Getter
+    private final long blackPieces, whitePieces, allPieces;
 
-    @Getter(lazy = true)
-    private final long allBlackPieces = calculateAllBlackPieces();
+    @Getter
+    private final Collection<Move> whiteMoves, blackMoves;
 
-    @Getter(lazy = true)
-    private final long allWhitePieces = calculateAllWhitePieces();
+    private final List<Collection<Move>> positionalMoves;
 
-    public State(Board board, int[] remainingPieces) {
-        super(board);
-        this.remainingPieces = remainingPieces;
-    }
-
-    public State(Board board) {
-        this(board, new int[] {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1});
-    }
+    @Getter
+    private final long coveredBlackPositions, dangerousBlackPositions, coveredWhitePositions, dangerousWhitePositions;
 
     public State expand(Move move) {
-        int[] newPieceCounts = new int[] {
-                remainingPieces[0],
-                remainingPieces[1],
-                remainingPieces[2],
-                remainingPieces[3],
-                remainingPieces[4],
-                remainingPieces[5],
-                remainingPieces[6],
-                remainingPieces[7],
-                remainingPieces[8],
-                remainingPieces[9],
-                remainingPieces[10],
-                remainingPieces[11],
-        };
+        var expandedBoard = new Board(board);
+        expandedBoard.move(move);
 
-        State state = new State(this, newPieceCounts);
-        state.move(move);
-        return state;
+        return expandedBoard.getBoardState();
     }
 
-    @Override
-    protected void onPieceRemoved(Piece piece) {
-        remainingPieces[piece.index]--;
-    }
-
-    @Override
-    protected void onPieceAdded(Piece piece) {
-        if (remainingPieces[piece.index] == -1) remainingPieces[piece.index] = 1; else 	remainingPieces[piece.index]++;
-    }
-
-    private long calculateAllBlackPieces() {
-        long pieces = 0;
-        for (Piece piece : Piece.getBlack()) {
-            pieces |= getState(piece);
-        }
-        return pieces;
-    }
-
-    private long calculateAllWhitePieces() {
-        long pieces = 0;
-        for (Piece piece : Piece.getWhite()) {
-            pieces |= getState(piece);
-        }
-        return pieces;
-    }
-
-    private int calculateRemainingBlackPieces() {
-        return Long.bitCount(getAllBlackPieces());
-    }
-
-    private int calculateRemainingWhitePieces() {
-        return Long.bitCount(getAllWhitePieces());
-    }
-
-    public int remainingPieces(Player player) {
+    public Collection<Move> getMoves(Player player) {
         if (player.isWhite()) {
-            return getRemainingWhitePieces();
+            return whiteMoves;
         } else {
-            return getRemainingBlackPieces();
+            return blackMoves;
         }
     }
 
-    public int remainingPieces(Piece piece) {
-        if (remainingPieces[piece.index] < 0) {
-            remainingPieces[piece.index] = Long.bitCount(getState(piece));
-        }
-
-        return remainingPieces[piece.index];
+    public Collection<Move> getMoves(int x, int y) {
+        return positionalMoves.get(y * 8 + x);
     }
 
-    public Piece victim(Piece attacker, long move) {
-        long victim = (move & getState(attacker)) ^ move;
-        for (Piece adversary : attacker.adversaries()) {
-            if ((victim & getState(adversary)) != 0)	{
-                return adversary;
-            }
+    public long getCoveredPositions(Player player) {
+        if (player.isWhite()) {
+            return coveredWhitePositions;
+        } else {
+            return coveredBlackPositions;
         }
-        return null;
+    }
+
+    public long getThreatenedPositions(Player player) {
+        if (player.isWhite()) {
+            return dangerousWhitePositions;
+        } else {
+            return dangerousBlackPositions;
+        }
     }
 
     public boolean isTerminal() {
-        return (remainingPieces(Piece.BLACK_KING) == 0 || remainingPieces(Piece.WHITE_KING) == 0);
+        return board[Piece.WHITE_KING.index] == 0 || board[Piece.BLACK_KING.index] == 0;
+    }
+
+    public int getPieceCount(Piece piece) {
+        return Long.bitCount(board[piece.index]);
     }
 
 }

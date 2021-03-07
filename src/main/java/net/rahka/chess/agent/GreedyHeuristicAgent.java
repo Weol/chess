@@ -10,7 +10,7 @@ import net.rahka.chess.game.Player;
 import net.rahka.chess.game.State;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Collection;
 import java.util.List;
 
 @Configurable
@@ -24,13 +24,11 @@ public class GreedyHeuristicAgent implements Agent {
     final RandomAgent randomAgent;
 
     @Override
-    public Move getMove(Player player, Iterator<Move> moves, State state) {
+    public Move getMove(Player player, Collection<Move> moves, State state) {
         List<Move> bestMoves = new ArrayList<>(10);
         int bestValue = Integer.MIN_VALUE;
 
-        while (moves.hasNext()) {
-            Move move = moves.next();
-
+        for (Move move : moves) {
             State expanded = state.expand(move);
             int value = getHeuristic().heuristic(player, expanded);
             if (value > bestValue) {

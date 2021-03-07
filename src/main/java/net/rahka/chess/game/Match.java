@@ -1,15 +1,12 @@
 package net.rahka.chess.game;
 
 import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import net.rahka.chess.agent.Agent;
 
-import java.util.ArrayList;
 import java.util.function.Consumer;
 
-@RequiredArgsConstructor
 public class Match {
 
 	public enum State {
@@ -20,10 +17,10 @@ public class Match {
 	}
 
 	@Getter
-	ArrayList<long[]> moves = new ArrayList<>(16);
+	final long[] initialState;
 
-	@NonNull @Getter
-	Board board;
+	@Getter
+	private final Board board;
 
 	@Getter @Setter
 	Agent whiteAgent, blackAgent;
@@ -40,25 +37,96 @@ public class Match {
 	@Setter
 	Consumer<Player> onCurrentPlayerChangeHandler;
 
-	@Setter
-	Consumer<long[]> onBoardStateChangeHandler;
-
 	@Getter
 	State state;
 
 	Thread thread;
 
-	public void setCurrentPlayer(Player player) {
+	public Match(long[] initialState) {
+		this.initialState = initialState;
+		this.board = new Board(initialState);
+
+		state = State.PREPARED;
+	}
+
+	public Match() {
+		this(createDefaultBoard());
+	}
+
+	private void playMatch(Agent whiteAgent, Agent blackAgent) {
+		Board board = getBoard();
+
+		boolean isDraw = false;
+		Player winner = null;
+		do {
+			{
+				setCurrentPlayer(Player.WHITE);
+				var boardState = board.getBoardState();
+				var move = whiteAgent.getMove(Player.WHITE, boardState.getWhiteMoves(), boardState);
+
+				//int fromI = Long.numberOfTrailingZeros(board.getState(move.piece) & move.move);
+				//int toI = Long.numberOfTrailingZeros((board.getState(move.piece) & move.move) ^ move.move);
+
+				//System.out.printf("White moved %s from (%d, %d) to (%d, %d)\n", move.piece, fromI % 8, fromI / 8, toI % 8, toI / 8);
+
+				board.move(move);
+
+				if (board.state[Piece.BLACK_KING.index] == 0) {
+					winner = Player.WHITE;
+					break;
+				}
+			}
+
+			if (winner == null && !Thread.currentThread().isInterrupted()) {
+				setCurrentPlayer(Player.BLACK);
+				var boardState = board.getBoardState();
+				var move = blackAgent.getMove(Player.BLACK, boardState.getBlackMoves(), boardState);
+
+				//int fromI = Long.numberOfLeadingZeros(board.getState(move.piece) & move.move);
+				//int toI = Long.numberOfLeadingZeros((board.getState(move.piece) & move.move) ^ move.move);
+
+				//System.out.printf("Black moved %s from (%d, %d) to (%d, %d)\n", move.piece, fromI % 8, fromI / 8, toI % 8, toI / 8);
+
+				board.move(move);
+
+				if (board.state[Piece.WHITE_KING.index] == 0) {
+					winner = Player.BLACK;
+					break;
+				}
+			}
+
+			if (board.getAllPieces() == (board.state[Piece.WHITE_KING.index] | board.state[Piece.BLACK_KING.index])) {
+				isDraw = true;
+				break;
+			}
+		} while (!Thread.currentThread().isInterrupted());
+
+
+		synchronized (this) {
+			if (winner != null || isDraw) {
+				this.winner = winner;
+				setMatchState(Match.State.FINISHED);
+			} else {
+				setMatchState(State.INTERRUPTED);
+			}
+		}
+	}
+
+	public synchronized void setCurrentPlayer(Player player) {
 		currentPlayer = player;
 		if (onCurrentPlayerChangeHandler != null) onCurrentPlayerChangeHandler.accept(player);
 	}
 
-	void setMatchState(State matchState) {
+	private synchronized void setMatchState(State matchState) {
 		state = matchState;
 		if (onStateChangeHandler != null) onStateChangeHandler.accept(matchState);
 	}
 
 	public void start() {
+		if (whiteAgent == null || blackAgent == null) throw new NullPointerException();
+
+		setMatchState(Match.State.ONGOING);
+		thread = new Thread(() -> playMatch(whiteAgent, blackAgent));
 		thread.start();
 	}
 
@@ -69,6 +137,23 @@ public class Match {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private static long[] createDefaultBoard() {
+		return new long[] {
+				0b00000000_00000000_00000000_00000000_00000000_00000000_11111111_00000000L,
+				0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_10000001L,
+				0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_01000010L,
+				0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_00100100L,
+				0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_00010000L,
+				0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_00001000L,
+				0b00000000_11111111_00000000_00000000_00000000_00000000_00000000_00000000L,
+				0b10000001_00000000_00000000_00000000_00000000_00000000_00000000_00000000L,
+				0b01000010_00000000_00000000_00000000_00000000_00000000_00000000_00000000L,
+				0b00100100_00000000_00000000_00000000_00000000_00000000_00000000_00000000L,
+				0b00001000_00000000_00000000_00000000_00000000_00000000_00000000_00000000L,
+				0b00010000_00000000_00000000_00000000_00000000_00000000_00000000_00000000L
+		};
 	}
 
 }

@@ -27,10 +27,7 @@ import lombok.NonNull;
 import net.rahka.chess.IO;
 import net.rahka.chess.agent.Agent;
 import net.rahka.chess.configuration.ConfigurableClass;
-import net.rahka.chess.game.Board;
-import net.rahka.chess.game.Match;
-import net.rahka.chess.game.Piece;
-import net.rahka.chess.game.Player;
+import net.rahka.chess.game.*;
 import net.rahka.chess.utils.AdjustableTimer;
 
 import java.lang.reflect.InvocationTargetException;
@@ -53,8 +50,9 @@ public class Visualizer extends Pane {
 	@NonNull @Getter
 	private Match match;
 
-	@Getter
-	private final Supplier<Match> matchSupplier;
+	private long[] initialState;
+	private long[][] boardStates;
+	private int boardStateCount;
 
 	@NonNull @Getter
 	private final ObservableList<ConfigurableClass<Agent>> agentConfigurables = FXCollections.observableArrayList();
@@ -108,9 +106,10 @@ public class Visualizer extends Pane {
 	public void setBlackAgentHolder(ConfigurableClass<Agent> configurableAgentClass) {blackAgentHolderProperty.set(configurableAgentClass);}
 	public ObjectProperty<ConfigurableClass<Agent>> blackAgentHolderProperty() {return blackAgentHolderProperty;}
 
-	public Visualizer(Supplier<Match> matchSupplier) {
-		this.matchSupplier = matchSupplier;
-		this.match = matchSupplier.get();
+	public Visualizer() {
+		this.match = new Match();
+		this.initialState = match.getBoard().getBoardState().getBoard();
+		this.boardStates = new long[256][];
 
 		menu = new EditContextMenu();
 		menu.setAutoHide(true);
@@ -264,76 +263,59 @@ public class Visualizer extends Pane {
 		long kernel = Board.kernelOf(x, y);
 
 		for (Piece p : Piece.values()) {
-			long state = match.getBoard().getState(p);
-
-			if ((kernel & state) != 0) {
-				match.getBoard().setState(p, state ^ kernel);
+			if ((kernel & initialState[piece.index]) != 0) {
+				initialState[p.index] ^= kernel;
 			}
 		}
 
-		long state = match.getBoard().getState(piece);
-		match.getBoard().setState(piece, state | kernel);
-
-		match.getBoard().setInitialState(Arrays.copyOf(match.getBoard().getState(), 12));
-		boardView.setBoardState(match.getBoard().getInitialState());
+		boardView.setBoardState(initialState);
 	}
 
 	private void resetBoard() {
 		if (match.getState() != Match.State.PREPARED) return;
 
-		match = matchSupplier.get();
 		newMatch();
 	}
 
 	private void killAllPieces(Piece piece) {
 		if (match.getState() != Match.State.PREPARED) return;
 
-		match.getBoard().setState(piece, 0);
-		match.getBoard().setInitialState(Arrays.copyOf(match.getBoard().getState(), 12));
-		boardView.setBoardState(match.getBoard().getInitialState());
+		initialState[piece.index] = 0;
+		boardView.setBoardState(initialState);
 	}
 
 	private void killAllPieces(Player player) {
 		if (match.getState() != Match.State.PREPARED) return;
 
 		for (Piece piece : Piece.of(player)) {
-			match.getBoard().setState(piece, 0);
+			initialState[piece.index] = 0;
 		}
 
-		match.getBoard().setInitialState(Arrays.copyOf(match.getBoard().getState(), 12));
-		boardView.setBoardState(match.getBoard().getInitialState());
+		boardView.setBoardState(initialState);
 	}
 
 	private void killBoardPiece(Piece piece, int x, int y) {
 		if (match.getState() != Match.State.PREPARED) return;
 
 		long kernel = Board.kernelOf(x, y);
-		long state = match.getBoard().getState(piece);
+		if ((kernel & initialState[piece.index]) != 0) {
+			initialState[piece.index] ^= kernel;
 
-		if ((kernel & state) != 0) {
-			match.getBoard().setState(piece, state ^ kernel);
-
-			match.getBoard().setInitialState(Arrays.copyOf(match.getBoard().getState(), 12));
-			boardView.setBoardState(match.getBoard().getInitialState());
+			boardView.setBoardState(initialState);
 		}
 	}
 
 	private void clearBoard() {
 		if (match.getState() != Match.State.PREPARED) return;
 
-		for (Piece piece : Piece.values()) {
-			match.getBoard().setState(piece, 0);
-		}
-
-		match.getBoard().setInitialState(Arrays.copyOf(match.getBoard().getState(), 12));
-		boardView.setBoardState(match.getBoard().getInitialState());
+		initialState = new long[12];
+		boardView.setBoardState(initialState);
 	}
 
 	private void reset() {
 		synchronized (this) {
 			pause();
 			setMoveIndex(-1);
-			boardView.setBoardState(match.getBoard().getInitialState());
 		}
 	}
 
@@ -355,16 +337,15 @@ public class Visualizer extends Pane {
 	}
 
 	private void newMatch() {
-		long[] oldInitialState = match.getBoard().getInitialState();
+		match = new Match(initialState);
 
-		match = matchSupplier.get();
-		match.getBoard().setInitialState(Arrays.copyOf(oldInitialState, 12));
-		match.getBoard().setState(Arrays.copyOf(oldInitialState, 12));
-		boardView.setBoardState(match.getBoard().getInitialState());
+		boardStateCount = 0;
+
+		boardView.setBoardState(initialState);
 
 		match.setOnCurrentPlayerChangeHandler((move) -> Platform.runLater(() -> onCurrentPlayerChange(move)));
 		match.setOnStateChangeHandler((state) -> Platform.runLater(() -> setMatchState(state)));
-		match.setOnBoardStateChangeHandler((move) -> this.nextMove());
+		match.getBoard().setOnBoardStateChangeHandler((move, state) -> Platform.runLater(() -> onMoveMade(move, state)));
 		matchStateProperty.set(Match.State.PREPARED);
 
 		setMoveIndex(-1);
@@ -379,7 +360,7 @@ public class Visualizer extends Pane {
 			moveTimer.start(() -> {
 				nextMove();
 
-				if (getMoveIndex() == match.getMoves().size() - 1 && match.getState() != Match.State.ONGOING) {
+				if (getMoveIndex() == boardStateCount && match.getState() != Match.State.ONGOING) {
 					pause();
 				}
 			}, playBackView.animationRateProperty.getValue());
@@ -396,13 +377,13 @@ public class Visualizer extends Pane {
 
 	public void setMoveIndex(int index) {
 		synchronized (this) {
-			index = Math.max(-1, Math.min(match.getMoves().size() - 1, index));
+			index = Math.max(-1, Math.min(boardStateCount - 1, index));
 
 			long[] state;
 			if (index < 0) {
-				state = match.getBoard().getInitialState();
+				state = initialState;
 			} else {
-				state = match.getMoves().get(index);
+				state = boardStates[index];
 			}
 
 			moveIndexProperty.set(index);
@@ -421,6 +402,16 @@ public class Visualizer extends Pane {
 	/**
 	 * Events
 	 */
+
+	private void onMoveMade(final Move move, final State state) {
+		if (boardStateCount == boardStates.length) {
+			boardStates = Arrays.copyOf(boardStates, boardStateCount * 2);
+		}
+
+		boardStates[boardStateCount++] = state.getBoard();
+
+		nextMove();
+	}
 
 	private void onMatchStateChange(Match.State state) {
 		switch (state) {
@@ -760,7 +751,7 @@ public class Visualizer extends Pane {
 
 				double width;
 				if (match != null && index > 0) {
-					width = getWidth() / (match.getMoves().size()) * index;
+					width = getWidth() / boardStateCount * index;
 				} else {
 					width = 0;
 				}
@@ -773,7 +764,7 @@ public class Visualizer extends Pane {
 
 		private void onPlayBackBarPressed(MouseEvent e) {
 			if (match != null && getMatchState() != Match.State.ONGOING && getMatchState() != Match.State.PREPARED) {
-				int index = (int) Math.round(e.getX() / playBackBar.widthProperty().divide(match.getMoves().size()).get());
+				int index = (int) Math.round(e.getX() / playBackBar.widthProperty().divide(boardStateCount).get());
 				setMoveIndex(index - 1);
 			}
 		}

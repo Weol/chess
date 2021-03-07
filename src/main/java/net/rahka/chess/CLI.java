@@ -1,14 +1,10 @@
 package net.rahka.chess;
 
 import net.rahka.chess.agent.Agent;
-import net.rahka.chess.game.Chess;
 import net.rahka.chess.game.Match;
 import net.rahka.chess.game.Player;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class CLI {
@@ -37,11 +33,8 @@ public class CLI {
     }
 
     public static void run(Agent blackAgent, Agent whiteAgent, int games) throws InterruptedException {
-        Chess chess = new Chess();
-
-
         for (int i = 0; i < games; i++) {
-            final Match match = chess.prepare();
+            final Match match = new Match();
             match.setBlackAgent(blackAgent);
             match.setWhiteAgent(whiteAgent);
 

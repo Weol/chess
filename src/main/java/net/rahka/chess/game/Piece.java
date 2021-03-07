@@ -22,10 +22,10 @@ public enum Piece {
     public int index;
 
     @Getter
-    private static Piece[] black = {BLACK_BISHOP, BLACK_KNIGHT, BLACK_ROOK, BLACK_KING, BLACK_PAWN, BLACK_QUEEN};
+    private static Piece[] black = {BLACK_PAWN, BLACK_KNIGHT, BLACK_ROOK, BLACK_BISHOP, BLACK_QUEEN, BLACK_KING};
 
     @Getter
-    private static Piece[] white = {WHITE_PAWN, WHITE_QUEEN, WHITE_BISHOP, WHITE_KNIGHT, WHITE_ROOK, WHITE_KING};
+    private static Piece[] white = {WHITE_PAWN, WHITE_KNIGHT, WHITE_ROOK, WHITE_BISHOP, WHITE_QUEEN, WHITE_KING};
 
     public static Piece[] of(Player player) {
         if (player.isWhite()) {
