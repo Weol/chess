@@ -138,6 +138,7 @@ public class Application extends javafx.application.Application {
 					try {
 						pendingMove.wait();
 					} catch (InterruptedException e) {
+						e.printStackTrace();
 						return null;
 					}
 				}

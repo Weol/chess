@@ -132,7 +132,7 @@ public class ChessBoard extends Pane {
 		y = Math.max(0, Math.min(7, y));
 
 		long kernel = Board.kernelOf(x, y);
-		if (selected == kernel) {
+		if (selected == kernel || (selected != 0 && e.isSecondaryButtonDown())) {
 			unselect();
 			return;
 		}
@@ -178,8 +178,6 @@ public class ChessBoard extends Pane {
 			return;
 		}
 
-		onSquarePressed(x, y);
-
 		attackers = 0;
 		victims = 0;
 		threatenedVictims = 0;
@@ -189,37 +187,32 @@ public class ChessBoard extends Pane {
 		selected = kernel;
 		selectedSquare = new Square(x, y, piece);
 
+		long dangerous = 0;
 		if (getShowThreats()) {
-			var moves = boardState.getMoves(piece.getPlayer().not());
-			for (Move move : moves) {
-				if ((kernel & move.move) != 0) {
-					attackers |= move.move;
-				}
+			if (piece.getPlayer().isWhite()) {
+				dangerous = boardState.getDangerousWhitePositions();
+			} else {
+				dangerous = boardState.getDangerousBlackPositions();
 			}
-			if (attackers != 0) attackers ^= kernel;
 		}
 
 		if (boardState.getMoves(x, y) != null) {
-			boolean showThreats = getShowThreats();
 			for (Move move : boardState.getMoves(x, y)) {
-				if ((kernel & move.move) != 0) {
-					victims |= move.move;
-				}
+				long destination = kernel ^ move.move;
+				victims |= destination;
 
-				if (showThreats) {
-					var nextBoardState = boardState.expand(move);
-
-					long nextKernel = (move.move ^ kernel);
-
-					var nextMoves = nextBoardState.getMoves(piece.getPlayer().not());
-					for (Move nextMove : nextMoves) {
-						if ((nextKernel & nextMove.move) != 0) {
-							threatenedVictims |= nextMove.move;
-						}
+				if (getShowThreats()) {
+					if ((destination & dangerous) != 0) {
+						threatenedVictims |= destination;
 					}
 				}
 			}
-			if (victims != 0) victims ^= kernel;
+		}
+
+		for (Move move : boardState.getMoves(piece.getPlayer().not())) {
+			if ((move.move & kernel) != 0) {
+				attackers |= (move.move ^ kernel);
+			}
 		}
 
 		paint();

@@ -117,8 +117,8 @@ public class Board {
 
 		var positionalMoves = new ArrayList<Collection<Move>>(64);
 
-		long kernel = 0b10000000_00000000_00000000_00000000_00000000_00000000_00000000_00000000L;
-		while (kernel != 0b0000000_00000000_00000000_00000000_00000000_00000000_00000000_00000001L) {
+		long kernel = 0b000000000_00000000_00000000_00000000_00000000_00000000_00000000_00000001L;
+		for (int i = 0; i < 64; i++) {
 			List<Move> moves = null;
 			if ((kernel & whitePositions) != 0) {
 				for (Piece piece : Piece.getWhite()) {
@@ -136,16 +136,16 @@ public class Board {
 
 			positionalMoves.add(moves);
 
-			kernel >>>= 1;
+			kernel <<= 1;
 		}
 
 		boardState = new State(Arrays.copyOf(state, 12),
 				whitePositions,
 				blackPositions,
 				blackPositions | whitePositions,
-				whiteMoves,
-				blackMoves,
-				positionalMoves,
+				Collections.unmodifiableCollection(whiteMoves),
+				Collections.unmodifiableCollection(blackMoves),
+				Collections.unmodifiableList(positionalMoves),
 				coveredBlackPositions[0],
 				dangerousBlackPositions[0],
 				coveredWhitePositions[0],
@@ -160,18 +160,18 @@ public class Board {
 			allied = getAllWhitePieces();
 			enemy = getAllBlackPieces();
 		} else {
-			enemy = getAllWhitePieces();
 			allied = getAllBlackPieces();
+			enemy = getAllWhitePieces();
 		}
 
 		int startIndex = moves.size();
 		PIECE_MOVES[piece.index].get(moves, dangerousPositions, coveredPositions, piece, kernel, allied, enemy);
 		int endIndex = moves.size();
 
-		return (startIndex != endIndex) ? moves.subList(startIndex, endIndex) : null;
+		return (startIndex != endIndex) ? new SubList<>(moves, startIndex, endIndex) : null;
 	}
 
-	private static void getWhitePawnMoves(List<Move> moves, long[] dangerousPositions, long[] coveredPositions, Piece piece, long current, long allied, long enemy) {
+	private static void getWhitePawnMoves(Collection<Move> moves, long[] dangerousPositions, long[] coveredPositions, Piece piece, long current, long allied, long enemy) {
 		long all = enemy | allied;
 
 		long next = current << 8;
@@ -206,8 +206,8 @@ public class Board {
 				} else {
 					moves.add(new Move(piece, current | nextRight));
 				}
-				dangerousPositions[0] |= nextRight;
 			}
+			dangerousPositions[0] |= nextRight;
 		} else if ((nextRight & allied) != 0) {
 			coveredPositions[0] |= nextRight;
 		}
@@ -225,14 +225,14 @@ public class Board {
 				} else {
 					moves.add(new Move(piece, current | nextLeft));
 				}
-				dangerousPositions[0] |= nextLeft;
 			}
+			dangerousPositions[0] |= nextLeft;
 		} else if ((nextLeft & allied) != 0) {
 			coveredPositions[0] |= nextLeft;
 		}
 	}
 
-	private static void getBlackPawnMoves(List<Move> moves, long[] dangerousPositions, long[] coveredPositions, Piece piece, long current, long allied, long enemy) {
+	private static void getBlackPawnMoves(Collection<Move> moves, long[] dangerousPositions, long[] coveredPositions, Piece piece, long current, long allied, long enemy) {
 		long all = enemy | allied;
 
 		long next = current >>> 8;
@@ -267,8 +267,8 @@ public class Board {
 				} else {
 					moves.add(new Move(piece, current | nextRight));
 				}
-				dangerousPositions[0] |= nextRight;
 			}
+			dangerousPositions[0] |= nextRight;
 		} else if ((nextRight & allied) != 0) {
 			coveredPositions[0] |= nextRight;
 		}
@@ -286,14 +286,14 @@ public class Board {
 				} else {
 					moves.add(new Move(piece, current | nextLeft));
 				}
-				dangerousPositions[0] |= nextLeft;
 			}
+			dangerousPositions[0] |= nextLeft;
 		} else if ((nextLeft & allied) != 0) {
 			coveredPositions[0] |= nextLeft;
 		}
 	}
 
-	private static void getRookMoves(List<Move> moves, long[] dangerousPositions, long[] coveredPositions, Piece piece, long current, long allied, long enemy) {
+	private static void getRookMoves(Collection<Move> moves, long[] dangerousPositions, long[] coveredPositions, Piece piece, long current, long allied, long enemy) {
 		{
 			long next = current;
 			while (next < 72057594037927936L && next > 0) {
@@ -363,7 +363,7 @@ public class Board {
 		}
 	}
 
-	private static void getBishopMoves(List<Move> moves, long[] dangerousPositions, long[] coveredPositions, Piece piece, long current, long allied, long enemy) {
+	private static void getBishopMoves(Collection<Move> moves, long[] dangerousPositions, long[] coveredPositions, Piece piece, long current, long allied, long enemy) {
 		{
 			long next = current;
 			while ((0b11111111_00000001_00000001_00000001_00000001_00000001_00000001_00000001L & next) == 0) {
@@ -433,7 +433,7 @@ public class Board {
 		}
 	}
 
-	private static void getKnightMoves(List<Move> moves, long[] dangerousPositions, long[] coveredPositions, Piece piece, long current, long allied, long enemy) {
+	private static void getKnightMoves(Collection<Move> moves, long[] dangerousPositions, long[] coveredPositions, Piece piece, long current, long allied, long enemy) {
 		if ((0b00000011_00000011_00000011_00000011_00000011_00000011_00000011_00000011L & current) == 0) {
 			if ((0b11111111_00000000_00000000_00000000_00000000_00000000_00000000_00000000L & current) == 0) {
 				long rightDown = current << 6;
@@ -531,12 +531,12 @@ public class Board {
 		}
 	}
 
-	private static void getQueenMoves(List<Move> moves, long[] dangerousPositions, long[] coveredPositions, Piece piece, long current, long allied, long enemy) {
+	private static void getQueenMoves(Collection<Move> moves, long[] dangerousPositions, long[] coveredPositions, Piece piece, long current, long allied, long enemy) {
 		getBishopMoves(moves, dangerousPositions, coveredPositions, piece, current, allied, enemy);
 		getRookMoves(moves, dangerousPositions, coveredPositions, piece, current, allied, enemy);
 	}
 
-	private static void getKingMoves(List<Move> moves, long[] dangerousPositions, long[] coveredPositions, Piece piece, long current, long allied, long enemy) {
+	private static void getKingMoves(Collection<Move> moves, long[] dangerousPositions, long[] coveredPositions, Piece piece, long current, long allied, long enemy) {
 		if ((0b00000001_00000001_00000001_00000001_00000001_00000001_00000001_00000001L & current) == 0) {
 			long right = current >>> 1;
 
@@ -635,6 +635,25 @@ public class Board {
 	public interface BoardStateChangeHandler {
 
 		void onStateChange(Move move, State state);
+
+	}
+
+	@RequiredArgsConstructor
+	private static class SubList<T> extends AbstractList<T> {
+
+		final List<T> parent;
+		final int fromIndex, toIndex;
+
+		@Override
+		public T get(int index) {
+			if (index < 0 || index >= toIndex) throw new IndexOutOfBoundsException();
+			return parent.get(fromIndex + index);
+		}
+
+		@Override
+		public int size() {
+			return toIndex - fromIndex;
+		}
 
 	}
 
