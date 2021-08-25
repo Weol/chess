@@ -67,8 +67,8 @@ public class Match {
 
 				if (move == null) break;
 
-				//int fromI = Long.numberOfTrailingZeros(board.getState(move.piece) & move.move);
-				//int toI = Long.numberOfTrailingZeros((board.getState(move.piece) & move.move) ^ move.move);
+				//int fromI = Long.numberOfTrailingZeros(boardState.getBoard(move.piece) & move.move);
+				//int toI = Long.numberOfTrailingZeros((boardState.getBoard(move.piece) & move.move) ^ move.move);
 
 				//System.out.printf("White moved %s from (%d, %d) to (%d, %d)\n", move.piece, fromI % 8, fromI / 8, toI % 8, toI / 8);
 
@@ -88,8 +88,8 @@ public class Match {
 
 				if (move == null) break;
 
-				//int fromI = Long.numberOfLeadingZeros(board.getState(move.piece) & move.move);
-				//int toI = Long.numberOfLeadingZeros((board.getState(move.piece) & move.move) ^ move.move);
+				//int fromI = Long.numberOfTrailingZeros(boardState.getBoard(move.piece) & move.move);
+				//int toI = Long.numberOfTrailingZeros((boardState.getBoard(move.piece) & move.move) ^ move.move);
 
 				//System.out.printf("Black moved %s from (%d, %d) to (%d, %d)\n", move.piece, fromI % 8, fromI / 8, toI % 8, toI / 8);
 

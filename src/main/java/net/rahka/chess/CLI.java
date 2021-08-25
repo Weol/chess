@@ -4,6 +4,7 @@ import net.rahka.chess.agent.Agent;
 import net.rahka.chess.game.Match;
 import net.rahka.chess.game.Player;
 
+import java.time.Duration;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -22,8 +23,8 @@ public class CLI {
 
             System.out.printf("%s won game %d / %d\n", player.toString(), i + 1, games);
 
-            if (player == Player.BLACK) blackWins.getAndUpdate((wins) -> wins++);
-            if (player == Player.WHITE) whiteWins.getAndUpdate((wins) -> wins++);
+            if (player == Player.BLACK) blackWins.getAndUpdate((wins) -> ++wins);
+            if (player == Player.WHITE) whiteWins.getAndUpdate((wins) -> ++wins);
 
             semaphore.release();
         } if (state == Match.State.INTERRUPTED) {
@@ -33,6 +34,8 @@ public class CLI {
     }
 
     public static void run(Agent blackAgent, Agent whiteAgent, int games) throws InterruptedException {
+        long current = System.currentTimeMillis();
+
         for (int i = 0; i < games; i++) {
             final Match match = new Match();
             match.setBlackAgent(blackAgent);
@@ -50,6 +53,13 @@ public class CLI {
         System.out.println("SUMMARY:");
         System.out.printf("Black (%s) won %.2f%% of the games (%d)\n", blackAgent.getClass().getSimpleName(), ((float) blackWins.get()) / games * 100, blackWins.get());
         System.out.printf("White (%s) won %.2f%% of the games (%d)\n", whiteAgent.getClass().getSimpleName(), ((float) whiteWins.get())/ games * 100, whiteWins.get());
+
+        String duration = Duration.ofMillis(System.currentTimeMillis() - current).toString()
+                .substring(2)
+                .replaceAll("(\\d[HMS])(?!$)", "$1 ")
+                .toLowerCase();
+
+        System.out.printf("Matches finished %d matches in %s\n", games, duration);
 
         System.exit(0);
     }

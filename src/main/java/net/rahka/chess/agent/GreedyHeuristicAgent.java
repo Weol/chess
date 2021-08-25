@@ -43,7 +43,7 @@ public class GreedyHeuristicAgent implements Agent {
         if (bestMoves.isEmpty()) {
             return randomAgent.getMove(player, moves, state);
         }
-        return bestMoves.get((int) (Math.random() * bestMoves.size()));
+        return randomAgent.getMove(player, bestMoves, state);
     }
 
 }

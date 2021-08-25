@@ -3,56 +3,72 @@ package net.rahka.chess;
 import com.sun.javafx.css.StyleManager;
 import javafx.application.Platform;
 import javafx.beans.Observable;
-import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import lombok.Getter;
 import net.rahka.chess.agent.Agent;
 import net.rahka.chess.agent.MiniMaxAgent;
 import net.rahka.chess.configuration.Configurable;
 import net.rahka.chess.configuration.ConfigurableClass;
 import net.rahka.chess.configuration.Configuration;
-import net.rahka.chess.game.*;
+import net.rahka.chess.game.Move;
+import net.rahka.chess.game.Piece;
+import net.rahka.chess.game.Player;
+import net.rahka.chess.game.State;
 import net.rahka.chess.visualizer.Visualizer;
+import net.rahka.parameters.CollectionFlag;
+import net.rahka.parameters.FunctionFlag;
+import net.rahka.parameters.ParameterInterpreter;
 
+import java.lang.reflect.InvocationTargetException;
+import java.time.Duration;
 import java.util.*;
 
 public class Application extends javafx.application.Application {
 
 	private static Application application;
+	private static Configuration configuration;
 
-	public static void main(String[] args) throws InterruptedException {
+	private static Random random = new Random();
+
+	public static void main(String[] args) throws InterruptedException, InvocationTargetException, IllegalAccessException, InstantiationException {
+		configuration = new Configuration("net.rahka.chess", Application.class);
+
 		if (args.length > 0) {
-					/*
+			var agents = configuration.find(Agent.class);
+
 			ParameterInterpreter interpreter = new ParameterInterpreter(
-				new CollectionFlag<>("black", "b", "The agent of the black player", AGENT_SUPPLIERS, true),
-				new CollectionFlag<>("white", "w", "The agent of the white player", AGENT_SUPPLIERS, true),
-				new CollectionFlag<>("blackHeuristic", "bh", "Black agent configurations heuristic", HEURISTIC_SUPPLIERS),
-				new CollectionFlag<>("whiteHeuristic", "wh", "White agent configurations heuristic", HEURISTIC_SUPPLIERS),
+				new CollectionFlag<>("black", "b", "The agent of the black player", agents, true),
+				new CollectionFlag<>("white", "w", "The agent of the white player", agents, true),
 				new FunctionFlag<>("number", "n", "Number of games to play", Integer::valueOf, true),
-				new FunctionFlag<>("depthlimit", "dl", "Agent configurations depth limit", Integer::valueOf)
+				new FunctionFlag<>("seed", "s", "The seed to random generators", Long::valueOf)
 			);
 			var interpretation = interpreter.interpret(args);
 
-			final HeuristicSupplier defaultHeuristicSupplier = new HeuristicSupplier("RemainingPiecesHeuristic", RemainingPiecesHeuristic::new);
+			random = new Random(interpretation.get("seed", new Random().nextLong()));
 
-			final HeuristicSupplier blackHeuristic = interpretation.get("blackHeuristic", defaultHeuristicSupplier);
-			final HeuristicSupplier whiteHeuristic = interpretation.get("whiteHeuristic", defaultHeuristicSupplier);
+			final ConfigurableClass<Agent> blackAgent = interpretation.get("black");
+			final ConfigurableClass<Agent> whiteAgent = interpretation.get("white");
 
+			final int games = interpretation.get("number");
 
-			final AgentSupplier blackAgentSupplier = (AgentSupplier) interpretation.get("black");
-			final AgentSupplier whiteAgentSupplier = (AgentSupplier) interpretation.get("white");
+			var black = blackAgent.build();
+			var white = whiteAgent.build();
 
-			final int depthLimit = interpretation.get("depthlimit", 4);
-
-			final int games = (int) interpretation.get("number");
-
-			CLI.run(blackAgentSupplier.getSupplier().apply(blackConfiguration), whiteAgentSupplier.getSupplier().apply(whiteConfiguration), games);
-		 	**/
+			long current = System.currentTimeMillis();
+			CLI.run(black, white, games);
+			String duration = Duration.ofMillis(current).toString()
+					.substring(2)
+					.replaceAll("(\\d[HMS])(?!$)", "$1 ")
+					.toLowerCase();
 		} else {
 			Application.launch();
 		}
+	}
+
+	@Configurable
+	public static Random random() {
+		return new Random(random.nextLong());
 	}
 
 	@Configurable
@@ -63,9 +79,6 @@ public class Application extends javafx.application.Application {
 	@Getter
 	private Visualizer visualizer;
 
-	@Getter
-	private Configuration configuration;
-
 	private final OptionalMove pendingMove = new OptionalMove();
 
 	@Override
@@ -73,8 +86,6 @@ public class Application extends javafx.application.Application {
 		super.init();
 
 		application = this;
-
-		configuration = new Configuration("net.rahka.chess", Application.class);
 	}
 
 	@Override
@@ -92,7 +103,7 @@ public class Application extends javafx.application.Application {
 		visualizer = new Visualizer();
 		visualizer.setPieceMoveHandler(this::onChessPieceMoved);
 
-		visualizer.getAgentConfigurables().addAll(getConfiguration().find(Agent.class));
+		visualizer.getAgentConfigurables().addAll(configuration.find(Agent.class));
 
 		visualizer.blackAgentHolderProperty().addListener(this::onAgentChosen);
 		visualizer.whiteAgentHolderProperty().addListener(this::onAgentChosen);

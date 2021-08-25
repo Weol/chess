@@ -48,7 +48,7 @@ public class MiniMaxAgent implements Agent {
         if (bestMoves.isEmpty()) {
             return randomAgent.getMove(player, moves, state);
         }
-        return bestMoves.get((int) (Math.random() * bestMoves.size()));
+        return randomAgent.getMove(player, bestMoves, state);
     }
 
     private int max(Player player, State state, int alpha, int beta, int depth) {

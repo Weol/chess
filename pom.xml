@@ -37,7 +37,7 @@
         <dependency>
             <groupId>net.rahka</groupId>
             <artifactId>parameters</artifactId>
-            <version>1578268482</version>
+            <version>1619716071</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

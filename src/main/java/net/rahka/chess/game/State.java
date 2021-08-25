@@ -44,6 +44,10 @@ public class State {
         return positionalMoves.get(y * 8 + x);
     }
 
+    public long getBoard(Piece piece) {
+        return board[piece.index];
+    }
+
     public long getCoveredPositions(Player player) {
         if (player.isWhite()) {
             return coveredWhitePositions;
