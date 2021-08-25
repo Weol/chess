@@ -31,4 +31,9 @@ public class ConfigurableClassItem extends ConfigurableItem {
             }
         }
     }
+
+    public Class<?> getCls() {
+        return cls;
+    }
+
 }

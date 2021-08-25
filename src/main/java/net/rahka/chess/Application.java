@@ -10,6 +10,7 @@ import net.rahka.chess.agent.Agent;
 import net.rahka.chess.agent.MiniMaxAgent;
 import net.rahka.chess.configuration.Configurable;
 import net.rahka.chess.configuration.ConfigurableClass;
+import net.rahka.chess.configuration.ConfigurableItem;
 import net.rahka.chess.configuration.Configuration;
 import net.rahka.chess.game.Move;
 import net.rahka.chess.game.Piece;
@@ -19,8 +20,13 @@ import net.rahka.chess.visualizer.Visualizer;
 import net.rahka.parameters.CollectionFlag;
 import net.rahka.parameters.FunctionFlag;
 import net.rahka.parameters.ParameterInterpreter;
+import org.json.JSONObject;
+import org.reflections.serializers.JsonSerializer;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
 import java.time.Duration;
 import java.util.*;
 
@@ -40,6 +46,8 @@ public class Application extends javafx.application.Application {
 			ParameterInterpreter interpreter = new ParameterInterpreter(
 				new CollectionFlag<>("black", "b", "The agent of the black player", agents, true),
 				new CollectionFlag<>("white", "w", "The agent of the white player", agents, true),
+				new FunctionFlag<>("blackConfiguration", "bc", "The configuration file of the black agent player", Application::fileToJson),
+				new FunctionFlag<>("whiteConfiguration", "wc", "The configuration file of the white agent player", Application::fileToJson),
 				new FunctionFlag<>("number", "n", "Number of games to play", Integer::valueOf, true),
 				new FunctionFlag<>("seed", "s", "The seed to random generators", Long::valueOf)
 			);
@@ -50,28 +58,50 @@ public class Application extends javafx.application.Application {
 			final ConfigurableClass<Agent> blackAgent = interpretation.get("black");
 			final ConfigurableClass<Agent> whiteAgent = interpretation.get("white");
 
+			final JSONObject blackConfiguration = interpretation.get("blackConfiguration");
+			final JSONObject whiteConfiguration = interpretation.get("whiteConfiguration");
+
 			final int games = interpretation.get("number");
+
+			for (ConfigurableItem dependency : blackAgent.getDependencies()) {
+				supplyConfigurable(dependency, blackConfiguration);
+			}
 
 			var black = blackAgent.build();
 			var white = whiteAgent.build();
 
-			long current = System.currentTimeMillis();
 			CLI.run(black, white, games);
-			String duration = Duration.ofMillis(current).toString()
-					.substring(2)
-					.replaceAll("(\\d[HMS])(?!$)", "$1 ")
-					.toLowerCase();
 		} else {
 			Application.launch();
 		}
 	}
 
-	@Configurable
+	private static void supplyConfigurable(ConfigurableItem dependency, JSONObject object) {
+		var name = dependency.getName();
+
+		if (!object.has(name)) return;
+
+		if (dependency.isConfigurableInteger()) {
+			dependency.setSupplier(() -> object.getLong(name));
+		} else if (dependency.isConfigurableFloatingPoint()) {
+			dependency.setSupplier(() -> object.getDouble(name));
+		} else if (dependency.isConfigurableBoolean()) {
+			dependency.setSupplier(() -> object.getBoolean(name));
+		} else if (dependency.isConfigurableString()) {
+			dependency.setSupplier(() -> object.getString(name));
+		}
+	}
+
+	private static JSONObject fileToJson(String path) throws IOException {
+		return new JSONObject(new String(Files.readAllBytes(new File(path).toPath())));
+	}
+
+	@Configurable(name = "Random")
 	public static Random random() {
 		return new Random(random.nextLong());
 	}
 
-	@Configurable
+	@Configurable(name = "Application")
 	public static Application application() {
 		return application;
 	}

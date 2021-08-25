@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ConfigurableBoolean {
 
-    String name() default "";
+    String name();
 
     boolean def() default true;
 

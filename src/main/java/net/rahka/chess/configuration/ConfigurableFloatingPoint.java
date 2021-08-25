@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ConfigurableFloatingPoint {
 
-    String name() default "";
+    String name();
 
     double min() default -Double.MAX_VALUE;
 

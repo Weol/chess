@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ConfigurableInt {
 
-    String name() default "";
+    String name();
 
     long min() default Integer.MIN_VALUE;
 

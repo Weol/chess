@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ConfigurableString {
 
-    String name() default "";
+    String name();
 
     String def() default "";
 
