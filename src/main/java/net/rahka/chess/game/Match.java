@@ -62,7 +62,10 @@ public class Match {
 			{
 				setCurrentPlayer(Player.WHITE);
 				var boardState = board.getBoardState();
+
 				var move = whiteAgent.getMove(Player.WHITE, boardState.getWhiteMoves(), boardState);
+
+				if (move == null) break;
 
 				//int fromI = Long.numberOfTrailingZeros(board.getState(move.piece) & move.move);
 				//int toI = Long.numberOfTrailingZeros((board.getState(move.piece) & move.move) ^ move.move);
@@ -77,10 +80,13 @@ public class Match {
 				}
 			}
 
-			if (winner == null && !Thread.currentThread().isInterrupted()) {
+			if (!Thread.currentThread().isInterrupted()) {
 				setCurrentPlayer(Player.BLACK);
+
 				var boardState = board.getBoardState();
 				var move = blackAgent.getMove(Player.BLACK, boardState.getBlackMoves(), boardState);
+
+				if (move == null) break;
 
 				//int fromI = Long.numberOfLeadingZeros(board.getState(move.piece) & move.move);
 				//int toI = Long.numberOfLeadingZeros((board.getState(move.piece) & move.move) ^ move.move);
@@ -100,7 +106,6 @@ public class Match {
 				break;
 			}
 		} while (!Thread.currentThread().isInterrupted());
-
 
 		synchronized (this) {
 			if (winner != null || isDraw) {

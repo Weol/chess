@@ -1,11 +1,9 @@
 package net.rahka.chess.game;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 import java.util.Objects;
+
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public final class Move {
 
@@ -15,8 +13,8 @@ public final class Move {
     @Getter
     public final long move;
 
-    @Getter
-    public Piece then;
+    @Getter @Setter
+    public Piece spawn;
 
     public Move(Piece piece, int fromX, int fromY, int toX, int toY) {
         this.piece = piece;

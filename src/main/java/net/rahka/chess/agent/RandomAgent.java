@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Always chooses a random move
  */
-@Configurable
+@Configurable(name = "Random")
 @RequiredArgsConstructor
 public class RandomAgent implements Agent {
 

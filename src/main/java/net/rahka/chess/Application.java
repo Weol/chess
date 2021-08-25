@@ -1,9 +1,12 @@
 package net.rahka.chess;
 
 import com.sun.javafx.css.StyleManager;
+import javafx.application.Platform;
 import javafx.beans.Observable;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import lombok.Getter;
 import net.rahka.chess.agent.Agent;
 import net.rahka.chess.agent.MiniMaxAgent;
@@ -84,6 +87,7 @@ public class Application extends javafx.application.Application {
 		stage.setMinHeight(700);
 		stage.setWidth(700);
 		stage.setHeight(700);
+		stage.getIcons().add(IO.image(IO.Images.WHITE_KNIGHT));
 
 		visualizer = new Visualizer();
 		visualizer.setPieceMoveHandler(this::onChessPieceMoved);
@@ -98,6 +102,11 @@ public class Application extends javafx.application.Application {
 			.findAny();
 		optionalAgentHolder.ifPresent(visualizer::setBlackAgentHolder);
 		optionalAgentHolder.ifPresent(visualizer::setWhiteAgentHolder);
+
+		stage.setOnCloseRequest(t -> {
+			Platform.exit();
+			System.exit(0);
+		});
 
 		stage.setScene(new Scene(visualizer));
 		stage.show();
@@ -119,10 +128,8 @@ public class Application extends javafx.application.Application {
 		}
 	}
 
-	@Configurable(name = "HumanAgent")
+	@Configurable(name = "Human")
 	public class HumanAgent implements Agent {
-
-		private Move previousMove;
 
 		@Override
 		public Move getMove(Player player, Collection<Move> moves, State state) {
@@ -146,11 +153,10 @@ public class Application extends javafx.application.Application {
 			} while (!pendingMove.isPresent() || matchingMoves.length == 0);
 
 			if (matchingMoves.length > 1) {
-				Piece[] pieces = Arrays.stream(matchingMoves).map(Move::getThen).toArray(Piece[]::new);
-				pendingMove.move.then = visualizer.showPiecePicker(pieces);
+				Piece[] pieces = Arrays.stream(matchingMoves).map(Move::getSpawn).toArray(Piece[]::new);
+				pendingMove.get().setSpawn(visualizer.showPiecePicker(pieces));
 			}
 
-			previousMove = pendingMove.get();
 			return pendingMove.get();
 		}
 

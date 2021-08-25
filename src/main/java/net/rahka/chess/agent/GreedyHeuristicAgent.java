@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-@Configurable
+@Configurable(name = "Greedy")
 @RequiredArgsConstructor
 public class GreedyHeuristicAgent implements Agent {
 

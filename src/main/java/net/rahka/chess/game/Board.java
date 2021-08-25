@@ -3,10 +3,8 @@ package net.rahka.chess.game;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import net.rahka.chess.utils.NullFilteredIterator;
 
 import java.util.*;
-import java.util.function.Consumer;
 
 public class Board {
 
@@ -57,9 +55,9 @@ public class Board {
 			}
 		}
 
-		if (move.then != null) {
+		if (move.spawn != null) {
 			state[move.piece.index] ^= victim;
-			state[move.then.index] |= victim;
+			state[move.spawn.index] |= victim;
 		}
 
 		var state = updateMoves();
@@ -180,7 +178,7 @@ public class Board {
 				for (Piece ally : Piece.getWhite()) {
 					if (ally == Piece.WHITE_KING) continue;
 					var move = new Move(piece, current | next);
-					move.then = ally;
+					move.spawn = ally;
 					moves.add(move);
 				}
 			} else {
@@ -200,7 +198,7 @@ public class Board {
 					for (Piece ally : Piece.getWhite()) {
 						if (ally == Piece.WHITE_KING) continue;
 						var move = new Move(piece, current | nextRight);
-						move.then = ally;
+						move.spawn = ally;
 						moves.add(move);
 					}
 				} else {
@@ -219,7 +217,7 @@ public class Board {
 					for (Piece ally : Piece.getWhite()) {
 						if (ally == Piece.WHITE_KING) continue;
 						var move = new Move(piece, current | nextLeft);
-						move.then = ally;
+						move.spawn = ally;
 						moves.add(move);
 					}
 				} else {
@@ -241,7 +239,7 @@ public class Board {
 				for (Piece ally : Piece.getBlack()) {
 					if (ally == Piece.BLACK_KING) continue;
 					var move = new Move(piece, current | next);
-					move.then = ally;
+					move.spawn = ally;
 					moves.add(move);
 				}
 			} else {
@@ -261,7 +259,7 @@ public class Board {
 					for (Piece ally : Piece.getBlack()) {
 						if (ally == Piece.BLACK_KING) continue;
 						var move = new Move(piece, current | nextRight);
-						move.then = ally;
+						move.spawn = ally;
 						moves.add(move);
 					}
 				} else {
@@ -280,7 +278,7 @@ public class Board {
 					for (Piece ally : Piece.getBlack()) {
 						if (ally == Piece.BLACK_KING) continue;
 						var move = new Move(piece, current | nextLeft);
-						move.then = ally;
+						move.spawn = ally;
 						moves.add(move);
 					}
 				} else {

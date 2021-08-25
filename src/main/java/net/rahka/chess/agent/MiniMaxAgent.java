@@ -15,7 +15,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Configurable(name = "MiniMax")
-@RequiredArgsConstructor()
+@RequiredArgsConstructor
 public class MiniMaxAgent implements Agent {
 
     @Getter @ConfigurableInt(name = "Depth limit", min = 1, def = 3)

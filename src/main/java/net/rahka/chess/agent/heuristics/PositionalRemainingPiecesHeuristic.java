@@ -5,7 +5,7 @@ import net.rahka.chess.game.Piece;
 import net.rahka.chess.game.Player;
 import net.rahka.chess.game.State;
 
-@Configurable(name = "PositionalRemainingHeuristics")
+@Configurable(name = "Positional + Remaining")
 public class PositionalRemainingPiecesHeuristic implements Heuristic {
 
     private int getPieceValue(Piece piece) {

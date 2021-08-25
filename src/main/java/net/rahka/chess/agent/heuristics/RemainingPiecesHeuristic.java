@@ -7,7 +7,7 @@ import net.rahka.chess.game.Piece;
 import net.rahka.chess.game.Player;
 import net.rahka.chess.game.State;
 
-@Configurable
+@Configurable(name = "Remaining")
 @RequiredArgsConstructor
 public class RemainingPiecesHeuristic implements Heuristic {
 

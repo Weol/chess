@@ -360,7 +360,7 @@ public class Visualizer extends Pane {
 			moveTimer.start(() -> {
 				nextMove();
 
-				if (getMoveIndex() == boardStateCount && match.getState() != Match.State.ONGOING) {
+				if (getMoveIndex() == boardStateCount - 1 && match.getState() != Match.State.ONGOING) {
 					pause();
 				}
 			}, playBackView.animationRateProperty.getValue());
@@ -433,7 +433,7 @@ public class Visualizer extends Pane {
 	private void onCurrentPlayerChange(Player player) {
 		String playerName = (player.isWhite()) ? "White" : "Black";
 
-		setCenterMessage(playerName + " player is moving...");
+		setCenterMessage(playerName + " is moving...");
 	}
 
 	private void onMouseExited(MouseEvent event) {
