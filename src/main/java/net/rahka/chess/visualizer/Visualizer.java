@@ -1,7 +1,6 @@
 package net.rahka.chess.visualizer;
 
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -17,23 +16,19 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Modality;
-import javafx.stage.Popup;
 import javafx.stage.Stage;
 import lombok.Getter;
 import lombok.NonNull;
 import net.rahka.chess.IO;
-import net.rahka.chess.agent.Agent;
+import net.rahka.chess.game.agent.Agent;
 import net.rahka.chess.configuration.ConfigurableClass;
 import net.rahka.chess.game.*;
-import net.rahka.chess.utils.AdjustableTimer;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Supplier;
 
 public class Visualizer extends Pane {
 

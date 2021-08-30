@@ -1,8 +1,0 @@
-{
-  "Depth limit": "asd",
-  "Heuristic": {
-    "Remaining + Positional": {
-      "size": 12
-    }
-  }
-}

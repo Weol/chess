@@ -1,8 +1,8 @@
-package net.rahka.chess.agent.heuristics;
+package net.rahka.chess.game.agent.heuristics;
 
 import lombok.RequiredArgsConstructor;
 import net.rahka.chess.configuration.Configurable;
-import net.rahka.chess.configuration.ConfigurableInt;
+import net.rahka.chess.configuration.ConfigurableString;
 import net.rahka.chess.game.Piece;
 import net.rahka.chess.game.Player;
 import net.rahka.chess.game.State;

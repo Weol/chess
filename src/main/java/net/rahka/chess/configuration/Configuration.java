@@ -19,17 +19,17 @@ public class Configuration {
 	private final String basePackage;
 
 	@Getter
-	private final Class<?> configurationClass;
+	private final Class<?>[] configurationClasses;
 
 	private final Map<Class<?>, Set<Invokable>> constructable = new HashMap<>();
 
 	public Configuration(String basePackage) {
-		this(basePackage, null);
+		this(basePackage, (Class<?>) null);
 	}
 
-	public Configuration(String basePackage, Class<?> configurationClass) {
+	public Configuration(String basePackage, Class<?> ... configurationClasses) {
 		this.basePackage = basePackage;
-		this.configurationClass = configurationClass;
+		this.configurationClasses = configurationClasses;
 
 		var reflections = new Reflections(basePackage);
 
@@ -43,27 +43,31 @@ public class Configuration {
 
 		var configurables = new HashSet<Invokable>();
 
-		if (configurationClass != null) {
-			for (Method method : configurationClass.getDeclaredMethods()) {
-				if (method.isAnnotationPresent(Configurable.class) && Modifier.isStatic(method.getModifiers())) {
-					method.setAccessible(true);
+		if (configurationClasses.length > 0) {
+			for (Class<?> configurationClass : configurationClasses) {
+				if (configurationClass == null) continue;
 
-					var params = new ArrayList<Invokable.InvokableParameter>(method.getParameterCount());
-					for (Parameter parameter : method.getParameters()) {
-						params.add(new Invokable.InvokableParameter(parameter.getType(), findParameterName(parameter), findConfigurableAnnotation(parameter)));
-					}
+				for (Method method : configurationClass.getDeclaredMethods()) {
+					if (method.isAnnotationPresent(Configurable.class) && Modifier.isStatic(method.getModifiers())) {
+						method.setAccessible(true);
 
-					var annotation = method.getAnnotation(Configurable.class);
-					String name = (annotation.name().length() > 0) ? annotation.name() : null;
-
-					var invokable = new Invokable(name, method.getReturnType(), params) {
-						@Override
-						Object invoke(Object... params) throws InvocationTargetException, IllegalAccessException {
-							return method.invoke(null, params);
+						var params = new ArrayList<Invokable.InvokableParameter>(method.getParameterCount());
+						for (Parameter parameter : method.getParameters()) {
+							params.add(new Invokable.InvokableParameter(parameter.getType(), findParameterName(parameter), findConfigurableAnnotation(parameter)));
 						}
-					};
 
-					configurables.add(invokable);
+						var annotation = method.getAnnotation(Configurable.class);
+						String name = (annotation.name().length() > 0) ? annotation.name() : null;
+
+						var invokable = new Invokable(name, method.getReturnType(), params) {
+							@Override
+							Object invoke(Object... params) throws InvocationTargetException, IllegalAccessException {
+								return method.invoke(null, params);
+							}
+						};
+
+						configurables.add(invokable);
+					}
 				}
 			}
 		}

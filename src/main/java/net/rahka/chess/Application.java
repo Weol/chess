@@ -1,110 +1,36 @@
 package net.rahka.chess;
 
+import com.github.rvesse.airline.annotations.Command;
+import com.github.rvesse.airline.annotations.Option;
 import com.sun.javafx.css.StyleManager;
 import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import lombok.Getter;
-import net.rahka.chess.agent.Agent;
-import net.rahka.chess.agent.MiniMaxAgent;
+import net.rahka.chess.game.agent.Agent;
+import net.rahka.chess.game.agent.MiniMaxAgent;
 import net.rahka.chess.configuration.Configurable;
 import net.rahka.chess.configuration.ConfigurableClass;
-import net.rahka.chess.configuration.ConfigurableItem;
 import net.rahka.chess.configuration.Configuration;
 import net.rahka.chess.game.Move;
 import net.rahka.chess.game.Piece;
 import net.rahka.chess.game.Player;
 import net.rahka.chess.game.State;
 import net.rahka.chess.visualizer.Visualizer;
-import net.rahka.parameters.CollectionFlag;
-import net.rahka.parameters.FunctionFlag;
-import net.rahka.parameters.ParameterInterpreter;
-import org.json.JSONObject;
-import org.reflections.serializers.JsonSerializer;
 
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.nio.file.Files;
-import java.time.Duration;
 import java.util.*;
+import java.util.function.Supplier;
 
-public class Application extends javafx.application.Application {
+@Command(name = "ui", description = "Use the UI to run chess games")
+public class Application extends javafx.application.Application implements CLI.Command {
+
+	@Option(name = {"-s", "--seed"}, description = "Seed for random generation")
+	private long seed = new Random().nextLong();
 
 	private static Application application;
 	private static Configuration configuration;
-
-	private static Random random = new Random();
-
-	public static void main(String[] args) throws InterruptedException, InvocationTargetException, IllegalAccessException, InstantiationException {
-		configuration = new Configuration("net.rahka.chess", Application.class);
-
-		if (args.length > 0) {
-			var agents = configuration.find(Agent.class);
-
-			ParameterInterpreter interpreter = new ParameterInterpreter(
-				new CollectionFlag<>("black", "b", "The agent of the black player", agents, true),
-				new CollectionFlag<>("white", "w", "The agent of the white player", agents, true),
-				new FunctionFlag<>("blackConfiguration", "bc", "The configuration file of the black agent player", Application::fileToJson),
-				new FunctionFlag<>("whiteConfiguration", "wc", "The configuration file of the white agent player", Application::fileToJson),
-				new FunctionFlag<>("number", "n", "Number of games to play", Integer::valueOf, true),
-				new FunctionFlag<>("seed", "s", "The seed to random generators", Long::valueOf)
-			);
-			var interpretation = interpreter.interpret(args);
-
-			random = new Random(interpretation.get("seed", new Random().nextLong()));
-
-			final ConfigurableClass<Agent> blackAgent = interpretation.get("black");
-			final ConfigurableClass<Agent> whiteAgent = interpretation.get("white");
-
-			final JSONObject blackConfiguration = interpretation.get("blackConfiguration");
-			final JSONObject whiteConfiguration = interpretation.get("whiteConfiguration");
-
-			final int games = interpretation.get("number");
-
-			for (ConfigurableItem dependency : blackAgent.getDependencies()) {
-				supplyConfigurable(dependency, blackConfiguration);
-			}
-
-			var black = blackAgent.build();
-			var white = whiteAgent.build();
-
-			CLI.run(black, white, games);
-		} else {
-			Application.launch();
-		}
-	}
-
-	private static void supplyConfigurable(ConfigurableItem dependency, JSONObject object) {
-		var name = dependency.getName();
-
-		if (!object.has(name)) return;
-
-		if (dependency.isConfigurableInteger()) {
-			dependency.setSupplier(() -> object.getLong(name));
-		} else if (dependency.isConfigurableFloatingPoint()) {
-			dependency.setSupplier(() -> object.getDouble(name));
-		} else if (dependency.isConfigurableBoolean()) {
-			dependency.setSupplier(() -> object.getBoolean(name));
-		} else if (dependency.isConfigurableString()) {
-			dependency.setSupplier(() -> object.getString(name));
-		}
-	}
-
-	private static JSONObject fileToJson(String path) throws IOException {
-		return new JSONObject(new String(Files.readAllBytes(new File(path).toPath())));
-	}
-
-	@Configurable(name = "Random")
-	public static Random random() {
-		return new Random(random.nextLong());
-	}
-
-	@Configurable(name = "Application")
-	public static Application application() {
-		return application;
-	}
+	private static Supplier<Random> randomSupplier;
 
 	@Getter
 	private Visualizer visualizer;
@@ -112,9 +38,28 @@ public class Application extends javafx.application.Application {
 	private final OptionalMove pendingMove = new OptionalMove();
 
 	@Override
+	public void run() throws Exception {
+		final var random = new Random(seed);
+		randomSupplier = () -> new Random(random.nextLong());
+
+		Application.launch();
+	}
+
+	@Configurable(name = "Application")
+	public static Application application() {
+		return application;
+	}
+
+	@Configurable(name = "Application")
+	public static Random random() {
+		return randomSupplier.get();
+	}
+
+	@Override
 	public void init() throws Exception {
 		super.init();
 
+		configuration = new Configuration("net.rahka.chess", Application.class, CLI.class);
 		application = this;
 	}
 

@@ -1,4 +1,4 @@
-package net.rahka.chess.agent.heuristics;
+package net.rahka.chess.game.agent.heuristics;
 
 import net.rahka.chess.configuration.Configurable;
 import net.rahka.chess.game.Piece;

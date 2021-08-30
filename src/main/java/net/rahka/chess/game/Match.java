@@ -2,8 +2,7 @@ package net.rahka.chess.game;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.experimental.Accessors;
-import net.rahka.chess.agent.Agent;
+import net.rahka.chess.game.agent.Agent;
 
 import java.util.function.Consumer;
 

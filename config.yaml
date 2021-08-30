@@ -1,0 +1,6 @@
+Black agent:
+  configuration: {Depth limit: 3}
+  name: MiniMax
+White agent:
+  configuration: {Depth limit: 3}
+  name: MiniMax

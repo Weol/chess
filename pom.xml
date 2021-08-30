@@ -10,9 +10,14 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>20210307</version>
+            <groupId>com.github.rvesse</groupId>
+            <artifactId>airline</artifactId>
+            <version>2.8.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>1.29</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -38,11 +43,6 @@
             <groupId>org.reflections</groupId>
             <artifactId>reflections</artifactId>
             <version>0.9.11</version>
-        </dependency>
-        <dependency>
-            <groupId>net.rahka</groupId>
-            <artifactId>parameters</artifactId>
-            <version>1619716071</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -79,13 +79,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <repositories>
-        <repository>
-            <id>github</id>
-            <name>GitHub Weol Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/weol/parameters</url>
-        </repository>
-    </repositories>
-
 </project>
