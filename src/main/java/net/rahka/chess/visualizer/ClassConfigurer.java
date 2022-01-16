@@ -56,7 +56,7 @@ class ClassConfigurer<T> extends GridPane {
     private void addClassField(ConfigurableClassItem item) {
         if (item.getClasses().size() == 1) {
             for (var cls : item.getClasses()) {
-                if (cls.getDependencies().length == 0) {
+                if (cls.getDependencies().length == 1) {
                     item.setSupplier(cls::build);
                     return;
                 }

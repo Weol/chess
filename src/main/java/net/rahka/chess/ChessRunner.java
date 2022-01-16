@@ -8,6 +8,7 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
 import net.rahka.chess.game.agent.Agent;
 import net.rahka.chess.game.Match;
 import net.rahka.chess.game.Player;
+import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
 import java.time.Duration;
@@ -15,6 +16,7 @@ import java.util.Random;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicReference;
 
+@SuppressWarnings("FieldMayBeFinal")
 @Command(name = "run", description = "Run multiple games at the same time")
 public class ChessRunner implements CLI.Command {
 
@@ -41,19 +43,17 @@ public class ChessRunner implements CLI.Command {
 
     @Override
     public void run() throws Exception {
+        Yaml yaml = new Yaml();
 
-    }
-
-    public static void run(Agent blackAgent, Agent whiteAgent, int games) throws InterruptedException {
         long current = System.currentTimeMillis();
 
-        for (int i = 0; i < games; i++) {
+        for (int i = 0; i < totalNumberOfGames; i++) {
             final Match match = new Match();
-            match.setBlackAgent(blackAgent);
-            match.setWhiteAgent(whiteAgent);
+            //match.setBlackAgent(blackAgent);
+            //match.setWhiteAgent(whiteAgent);
 
             final int finalI = i;
-            match.setOnStateChangeHandler((state) -> onMatchStateChange(match, state, finalI, games));
+            //match.setOnStateChangeHandler((state) -> onMatchStateChange(match, state, finalI, games));
 
             semaphore.acquire();
             match.start();
@@ -62,17 +62,15 @@ public class ChessRunner implements CLI.Command {
         semaphore.acquire(MAX_CONCURRENT_MATCHES);
 
         System.out.println("SUMMARY:");
-        System.out.printf("Black (%s) won %.2f%% of the games (%d)\n", blackAgent.getClass().getSimpleName(), ((float) blackWins.get()) / games * 100, blackWins.get());
-        System.out.printf("White (%s) won %.2f%% of the games (%d)\n", whiteAgent.getClass().getSimpleName(), ((float) whiteWins.get())/ games * 100, whiteWins.get());
+        //System.out.printf("Black (%s) won %.2f%% of the games (%d)\n", blackAgent.getClass().getSimpleName(), ((float) blackWins.get()) / games * 100, blackWins.get());
+        //System.out.printf("White (%s) won %.2f%% of the games (%d)\n", whiteAgent.getClass().getSimpleName(), ((float) whiteWins.get())/ games * 100, whiteWins.get());
 
         String duration = Duration.ofMillis(System.currentTimeMillis() - current).toString()
                 .substring(2)
                 .replaceAll("(\\d[HMS])(?!$)", "$1 ")
                 .toLowerCase();
 
-        System.out.printf("Matches finished %d matches in %s\n", games, duration);
-
-        System.exit(0);
+        System.out.printf("Matches finished %d matches in %s\n", totalNumberOfGames, duration);
     }
 
     private static void onMatchStateChange(Match match, Match.State state, int i, int games) {

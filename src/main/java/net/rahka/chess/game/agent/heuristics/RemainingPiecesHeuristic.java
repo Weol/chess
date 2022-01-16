@@ -2,7 +2,8 @@ package net.rahka.chess.game.agent.heuristics;
 
 import lombok.RequiredArgsConstructor;
 import net.rahka.chess.configuration.Configurable;
-import net.rahka.chess.configuration.ConfigurableString;
+import net.rahka.chess.configuration.ConfigurableFloatingPoint;
+import net.rahka.chess.configuration.ConfigurableInt;
 import net.rahka.chess.game.Piece;
 import net.rahka.chess.game.Player;
 import net.rahka.chess.game.State;
@@ -33,6 +34,12 @@ public class RemainingPiecesHeuristic implements Heuristic {
         }
         return 0;
     }
+
+    @ConfigurableInt(name = "asd")
+    final int asd;
+
+    @Configurable(name = "fallback")
+    final Heuristic heuristic;
 
     @Override
     public int heuristic(Player player, State state) {

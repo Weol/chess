@@ -10,12 +10,14 @@ import net.rahka.chess.configuration.ConfigurableClass;
 import net.rahka.chess.configuration.ConfigurableItem;
 import net.rahka.chess.configuration.Configuration;
 import net.rahka.chess.game.agent.Agent;
+import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -23,11 +25,11 @@ import java.util.Random;
 @Command(name = "gen-conf", description = "Generate configuration file for agents")
 public class ConfigurationGenerator implements CLI.Command {
 
-    @Option(name = {"-w", "--white"}, description = "The total number of games to run")
+    @Option(name = {"-w", "--white"}, description = "The white agent")
     @Required
     private String whiteAgentName;
 
-    @Option(name = {"-b", "--black"}, description = "The total number of games to run")
+    @Option(name = {"-b", "--black"}, description = "The black agent")
     @Required
     private String blackAgentName;
 
@@ -56,67 +58,53 @@ public class ConfigurationGenerator implements CLI.Command {
         }
 
         if (whiteAgentClass == null && blackAgentClass == null) {
-            throw new RuntimeException("Could not find agent class with the name of \"" + blackAgentName + "\" or \""  + whiteAgentName + "\"");
+            throw new RuntimeException("Could not find agent class with the name of \"" + blackAgentName + "\" or \"" + whiteAgentName + "\"");
         } else if (whiteAgentClass == null) {
             throw new RuntimeException("Could not find agent class with the name of \"" + whiteAgentName + "\"");
         } else if (blackAgentClass == null) {
             throw new RuntimeException("Could not find agent class with the name of \"" + blackAgentName + "\"");
         }
 
+        var lines = new ArrayList<String>();
+        lines.add("White agent:");
+        generateConfigMap(whiteAgentClass, lines, 1);
+        lines.add("Black agent:");
+        generateConfigMap(blackAgentClass, lines, 1);
 
-        var whiteConfig = new HashMap<String, Object>();
-        var blackConfig = new HashMap<String, Object>();
-
-        generateConfigMap(whiteAgentClass, whiteConfig);
-        generateConfigMap(blackAgentClass, blackConfig);
-
-        Map<String, Object> config = new HashMap<>();
-        config.put("White agent", Map.of("name", whiteAgentClass.getName(), "configuration", whiteConfig));
-        config.put("Black agent", Map.of("name", blackAgentClass.getName(), "configuration", blackConfig));
-
-        Yaml yaml = new Yaml();
-        yaml.dump(config, new BufferedWriter(new FileWriter(outputFile)));
-        yaml.dump(config, new BufferedWriter(new OutputStreamWriter(System.out)));
+        try (var writer = new BufferedWriter(new FileWriter(outputFile))) {
+            for (String line : lines) {
+                writer.write(line);
+                System.out.println(line);
+            }
+        }
 
         System.out.println("Configuration file written to \"" + outputFile.getAbsolutePath() + "\"");
     }
 
-    private int generateConfigMap(ConfigurableClass<?> configurableClass, Map<String, Object> config) {
-        int options = 0;
+    private void generateConfigMap(ConfigurableClass<?> configurableClass, ArrayList<String> config, int indent) {
+        var indentation = new String(new char[indent * 2]).replace("\0", " ");
         for (ConfigurableItem dependency : configurableClass.getDependencies()) {
             if (dependency.isConfigurableInteger()) {
-                config.put(dependency.getName(), dependency.asConfigurableInteger().getDef());
-                options++;
+                config.add(indentation + dependency.getName() + ": " + dependency.asConfigurableInteger().getDef());
             } else if (dependency.isConfigurableFloatingPoint()) {
-                config.put(dependency.getName(), dependency.asConfigurableFloatingPoint().getDef());
-                options++;
+                config.add(indentation + dependency.getName() + ": " + dependency.asConfigurableFloatingPoint().getDef());
             } else if (dependency.isConfigurableBoolean()) {
-                config.put(dependency.getName(), dependency.asConfigurableBoolean().getDef());
-                options++;
+                config.add(indentation + dependency.getName() + ": " + dependency.asConfigurableBoolean().getDef());
             } else if (dependency.isConfigurableString()) {
-                config.put(dependency.getName(), dependency.asConfigurableString().getDef());
-                options++;
-            } else if (dependency.isConfigurableClass()) {
-                options++;
+                config.add(indentation + dependency.getName() + ": \"" + dependency.asConfigurableString().getDef() + "\"");
             }
         }
 
         for (ConfigurableItem dependency : configurableClass.getDependencies()) {
-            if (dependency.isConfigurableClass()) {
-                var dependencyConfig = new HashMap<String, Object>();
-                int dependencyOptions = generateConfigMap(dependency.asConfigurableClass().getDef(), dependencyConfig);
-
-                if (dependencyOptions > 1) {
-                    config.put(dependency.getName(), Map.of("name", dependency.asConfigurableClass().getDef().getName(), "configuration", dependencyConfig));
-                } else if (dependency.asConfigurableClass().getClasses().size() > 1) {
-                    config.put(dependency.getName(), dependency.asConfigurableClass().getDef().getName());
+            if (dependency.isConfigurableClass() && dependency.asConfigurableClass().getClasses().size() > 1) {
+                if (dependency.asConfigurableClass().getDef().getDependencies().length > 0) {
+                    config.add(indentation + "- " + dependency.getName() + ": " + dependency.asConfigurableClass().getDef().getName());
+                    generateConfigMap(dependency.asConfigurableClass().getDef(), config, indent + 1);
+                } else {
+                    config.add(indentation + dependency.getName() + ": " + dependency.asConfigurableClass().getDef().getName());
                 }
-
-                options = Math.max(dependencyOptions, options);
             }
         }
-
-        return options;
     }
 
 }
