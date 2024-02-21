@@ -52,7 +52,7 @@ public class Application extends javafx.application.Application implements CLI.C
 
 	@Configurable(name = "Application")
 	public static Random random() {
-		return randomSupplier.get();
+		return new Random();
 	}
 
 	@Override
